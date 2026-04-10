@@ -1,11 +1,11 @@
 # Emovr Migratie
 
-## Status: In voorbereiding
+## Status: Mock Cycle 1 — Clean done, partial test import done
 
 ## Klant
 - **Bedrijf:** Emovr BV
 - **Sector:** Elektrische carriers en aanbouwdelen voor de bouw
-- **Odoo:** Enterprise (pantalytics.odoo.com)
+- **Odoo:** Enterprise (emovr.odoo.com)
 
 ## Bronbestanden
 - `Machines&Klanten Emovr.xlsx` — Machinepark per klant + productie-overzichten
@@ -139,3 +139,26 @@
 - [ ] Is er een klant "Emovr BV" zelf nodig als partner (voor demo-machines)?
 - [ ] Status (Geleverd/Besteld/Gereserveerd) — als lot status of als apart veld?
 - [ ] Prijzen zonder BTW of inclusief?
+- [ ] "Brouwer" en "Brouwer Egalisatie" — zelfde klant of 2 aparte bedrijven?
+
+## Odoo Omgeving Status
+
+### Huidige staat (2026-04-10)
+- **URL:** emovr.odoo.com
+- **Company:** Emovr B.V. (id=1)
+- **Bestaande data:** 6 partners (incl. 3 test-imports), 3 producten (test-imports)
+
+### Test-imports (Mock Cycle 1)
+Aangemaakt op 2026-04-10 — kunnen verwijderd worden indien nodig:
+- res.partner 14: Compraan BV
+- res.partner 15: GKB Buiteninrichting
+- res.partner 16: SS Teknikk AS
+- res.partner 17: Marinus Slingerland (contact bij SS Teknikk AS)
+- product.template 1: TRC1.5 Carrier (38000000, EUR 19.950)
+- product.template 2: Optie Kraan 500KG (38040001, EUR 10.750)
+- product.template 3: Optie Dumper opbouw (38030001, EUR 3.250)
+
+### Vereiste modules (nog te activeren door klant)
+- [ ] **Inventory (stock)** — nodig voor stock.lot (serienummers). Ga naar Instellingen → Apps → Installeer 'Voorraad'
+- [ ] Sales — waarschijnlijk al actief, te verifiëren
+- [ ] Overige modules afhankelijk van antwoorden op open vragen
