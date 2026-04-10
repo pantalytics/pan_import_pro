@@ -1,0 +1,36 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+
+# Environment
+.env
+.env.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Client data — never commit original Excel files
+migrations/*/input/*.xlsx
+migrations/*/input/*.xls
+migrations/*/input/*.csv
+migrations/*/input/*.docx
+
+# Cleaned and mapped data may contain sensitive client info
+migrations/*/cleaned/
+migrations/*/mapped/
+migrations/*/logs/
+
+# Claude Code
+.claude/
