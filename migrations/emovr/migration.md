@@ -188,7 +188,13 @@ Geïmporteerd via import_records (Odoo load() met external IDs):
 
 ### Module status (2026-04-13)
 - [x] **Inventory (stock)** — geactiveerd, stock.lot beschikbaar
+- [x] **Lots & Serial Numbers** — setting aangezet via MCP (res.config.settings)
 - [x] **Field Service (industry_fsm)** — geactiveerd, project.task met FSM
+- [x] **Maintenance** — geactiveerd (voor intern gebruik, NIET voor klant-machines)
 - [x] **Sales** — actief
-- [ ] **Maintenance** — NIET beschikbaar. Klant moet activeren voor garantie/service datums
-      Ga naar Instellingen → Apps → Installeer 'Onderhoud'
+- [ ] **Helpdesk** — nog te activeren (voor after-sales tickets van klanten)
+
+### Configuratie
+- TRC1.5 Carrier (product.template ID 4): tracking = "serial"
+- lot_properties_definition op product.product ID 4: leveringsdatum, garantiedatum, servicedatum, keuringsdatum
+- 6 carriers met service-datums ingevuld via lot_properties
