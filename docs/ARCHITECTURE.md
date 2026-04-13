@@ -106,10 +106,46 @@ Execute the approved plan via Odoo MCP `import_records` (wraps `load()`).
 - Import in dependency order
 - Use external IDs for idempotent upsert
 - Context: `tracking_disable=True` to suppress notifications
+- **Import in small batches** — not everything at once
+- **Verify after EACH batch** before continuing (see Step 7)
 - Log all created/updated record IDs
 - Report results to client
 
-### Step 7: Verify & Iterate
+### Step 7: Verify (after every import)
+
+**Critical step — do NOT skip.** After every import batch, verify that the data is correct before importing the next batch.
+
+#### Automated verification (AI)
+The AI samples records and cross-checks against source data:
+- Pick 3-5 random imported records
+- Read them back from Odoo via MCP
+- Compare each field against the source CSV
+- Check relational fields (does the lot point to the right partner? does the sale order have the right serial number?)
+- Report: "Checked 5 records, 5 correct" or "Record X has wrong partner — expected GKB, got SS Teknikk"
+
+Example checks:
+```
+Source: EMTRC150925005 → GKB Buiteninrichting → delivered 2025-12-17
+Odoo:   stock.lot.name=EMTRC150925005 → partner_ids=[33] ✓
+        sale.order.partner_id=GKB ✓
+        stock.picking.date_done=2025-12-17 ✓
+        → OK
+```
+
+#### Manual verification (client)
+After AI verification passes, ask the client to spot-check:
+- "Can you check serial number EMTRC150925005 in Odoo? Does it show GKB Buiteninrichting with delivery date 17 december 2025?"
+- Provide direct Odoo URLs for easy checking
+- Use the 3-tier feedback format for the verification report
+
+#### What to do when verification fails
+- **Stop importing** — don't continue with more data until the issue is fixed
+- Diagnose the root cause (wrong ID mapping? shifted data? API behavior?)
+- Fix and re-import the failed batch
+- Re-verify
+- Only then continue with the next batch
+
+### Step 8: Iterate
 
 Client checks results in Odoo. This always produces feedback.
 
@@ -122,11 +158,12 @@ Client checks results in Odoo. This always produces feedback.
 Typically 3-5 cycles before go-live.
 
 ```
-Step 1 ─→ Step 2 ─→ Step 3 ─→ Step 4 ─→ Step 5 ─→ Step 6 ─→ Step 7
-Know       Apps &    Scan &    Clean &   Map to    Import    Verify
-Client     Config    Understand Normalize Odoo      Upsert    & Iterate
-                                                              │
-                         ┌────────────────────────────────────┘
+Step 1 ─→ Step 2 ─→ Step 3 ─→ Step 4 ─→ Step 5 ─→ Step 6 ─→ Step 7 ─→ Step 8
+Know       Apps &    Scan &    Clean &   Map to    Import    Verify     Iterate
+Client     Config    Understand Normalize Odoo      (batch)   (each      │
+                                                    ↓         batch)     │
+                                                    Step 7 ←──┘          │
+                         ┌───────────────────────────────────────────────┘
                          │ Client feedback / corrections / new data
                          ▼
                     Back to Step 3, 4, 5, or 6 as needed
