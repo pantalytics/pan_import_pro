@@ -38,6 +38,29 @@ Every step must support re-running without creating duplicates. That's why we us
 Profile → Upload → Analyze → Questions → Import → Verify → Client feedback → Repeat
 ```
 
+## Migration Principles (from experienced implementation partners)
+
+### Master data first, transactional data maybe never
+Almost all ERP projects can go live with just master data (contacts, products, pricelists). Transactional data (orders, invoices) is rarely needed. The exceptions: opening balances in accounting, and in-progress orders. Don't migrate old invoices unless the client explicitly needs them.
+
+### Don't replicate the old system
+Clients often want Odoo to look exactly like their previous system (Excel, legacy ERP). This is a mistake. Odoo has its own workflows — use them. The migration is an opportunity to improve processes, not copy broken ones.
+
+### Data quality gets amplified
+ERP systems amplify data quality — good or bad. Legacy data often contains duplicates, inconsistent formatting, outdated records. Migrating garbage into Odoo makes everything worse. Always clean before importing.
+
+### Assign data ownership
+Each data type should have an owner: sales owns customer data, warehouse owns inventory, accounting owns the chart of accounts. Don't make decisions about data you don't own — ask the responsible person.
+
+### Test with a small batch first
+Before full migration, test with 10% of the data. This catches mapping errors, missing fields, and unexpected Odoo behavior with a manageable dataset.
+
+### Keep legacy systems accessible
+Plan for 6-18 months of read-only access to the old system. The client will need to look up historical data that wasn't migrated.
+
+### Minimize what you migrate
+For each dataset, ask: "Do we actually need this in Odoo?" Unused products, dormant customers, 10-year-old orders — leave them in the legacy system. Less data = cleaner Odoo = faster go-live.
+
 ## Steps
 
 ### Step 1: Company Profile
