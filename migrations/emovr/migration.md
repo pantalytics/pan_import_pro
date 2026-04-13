@@ -139,13 +139,19 @@
 - **Ontbrekende prijzen:** Prijs €0 is acceptabel — klant vult later aan in Odoo. list_price is niet verplicht.
 - **Service/garantiedatums:** Advies: Maintenance module gebruiken. `maintenance.equipment` heeft `warranty_date` en `effective_date`, koppelt via `lot_id` aan `stock.lot`. Geen custom module nodig.
 
-### Beantwoord door klant (ronde 2, 2026-04-13)
-- **Brouwer/Brouwer Egalisatie:** Zelfde klant → samenvoegen tot "Brouwer". Brouwer Egalisatie is een project.
-- **Machines zonder klant:** EMTRC150925009 → Van de Ende. Rest is in productie, nog geen klant.
-- **Rongen Systeem:** Accessoire, geen serienummer nodig. Importeren als product.
-- **Onvolledige serienummers:** EMTRC15092500 (SS Teknikk) → EMTRC1509250007. Andere → EMTRC1509250010.
+### GESIMULEERD voor test — terugdraaien, aan klant vragen!
+De volgende antwoorden zijn gesimuleerd om de iteratieve loop te testen.
+Ze zijn al verwerkt in clean.py en Odoo maar moeten nog bevestigd worden door de klant.
+- **Brouwer/Brouwer Egalisatie:** GESIMULEERD: samenvoegen tot "Brouwer"
+- **Machines zonder klant:** GESIMULEERD: EMTRC150925009 → Van de Ende
+- **Rongen Systeem:** GESIMULEERD: importeren als accessoire
+- **Onvolledige serienummers:** GESIMULEERD: EMTRC15092500 → EMTRC1509250007 / EMTRC1509250010
 
-### Nog open (intern)
+### Aan klant vragen
+- [ ] "Brouwer" en "Brouwer Egalisatie" — zelfde bedrijf of twee aparte?
+- [ ] 5 machines zonder klant — welke klant hoort erbij, of is het voorraad?
+- [ ] Rongen Systeem zonder serienummer — importeren als accessoire of overslaan?
+- [ ] 2x onvolledig serienummer EMTRC15092500 — wat zijn de volledige nummers?
 - [ ] Moeten de component-serienummers (motors, DMC, etc.) ook als lots?
 - [ ] Is er een klant "Emovr BV" zelf nodig als partner (voor demo-machines)?
 - [ ] Status (Geleverd/Besteld/Gereserveerd) — als lot status of als apart veld?
