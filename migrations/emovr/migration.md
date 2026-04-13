@@ -169,7 +169,9 @@ Geïmporteerd via import_records (Odoo load() met external IDs):
 - Idempotentie bewezen: herhaalde import updatet, geen duplicaten
 - Oude test-imports (zonder external IDs) opgeruimd
 
-### Vereiste modules (nog te activeren door klant)
-- [ ] **Inventory (stock)** — nodig voor stock.lot (serienummers). Ga naar Instellingen → Apps → Installeer 'Voorraad'
-- [ ] **Maintenance** — nodig voor garantie/service/keuringsdatums. Ga naar Instellingen → Apps → Installeer 'Onderhoud'
-- [ ] Sales — waarschijnlijk al actief, te verifiëren
+### Module status (2026-04-13)
+- [x] **Inventory (stock)** — geactiveerd, stock.lot beschikbaar
+- [x] **Field Service (industry_fsm)** — geactiveerd, project.task met FSM
+- [x] **Sales** — actief
+- [ ] **Maintenance** — NIET beschikbaar. Klant moet activeren voor garantie/service datums
+      Ga naar Instellingen → Apps → Installeer 'Onderhoud'
