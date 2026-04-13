@@ -103,12 +103,23 @@ Match cleaned data to Odoo models and fields.
 
 Execute the approved plan via Odoo MCP `import_records` (wraps `load()`).
 
+- **BACKUP FIRST** — ask client to confirm a database backup/restore point exists before ANY stock-related import. Done stock moves are IRREVERSIBLE via API.
 - Import in dependency order
 - Use external IDs for idempotent upsert
 - Context: `tracking_disable=True` to suppress notifications
-- **Import in small batches** — not everything at once
+- **Import ONE record first** — verify it's correct, then do the rest
 - **Verify after EACH batch** before continuing (see Step 7)
 - Log all created/updated record IDs
+
+**HIGH RISK operations** (require backup + single-record test):
+- Sale orders with deliveries (stock.picking)
+- Stock moves (stock.move, stock.move.line)
+- Anything that creates "done" inventory transactions
+
+**LOW RISK operations** (idempotent via external IDs, safe to re-run):
+- Partners (res.partner)
+- Products (product.template)
+- Serial numbers without stock moves (stock.lot)
 - Report results to client
 
 ### Step 7: Verify (after every import)
