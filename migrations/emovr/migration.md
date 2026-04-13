@@ -3,9 +3,13 @@
 ## Status: Mock Cycle 1 — Complete (klanten, contacten, producten geïmporteerd)
 
 ## Klant
-- **Bedrijf:** Emovr BV
+- **Bedrijf:** Emovr B.V. (res.partner ID 1 in Odoo)
 - **Sector:** Elektrische carriers en aanbouwdelen voor de bouw
 - **Odoo:** Enterprise (emovr.odoo.com)
+- **Klantprofiel:** Opgeslagen in Odoo op res.partner ID 1 → Notes veld
+- **Website:** https://www.emovr.nl
+- **Locatie:** Barneveld, NL
+- **Migratietype:** Greenfield + cutover (nieuw Odoo, data uit Excel)
 
 ## Bronbestanden
 - `Machines&Klanten Emovr.xlsx` — Machinepark per klant + productie-overzichten
