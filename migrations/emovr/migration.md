@@ -154,7 +154,12 @@
 
 ### Beantwoord
 - **Ontbrekende prijzen:** Prijs €0 is acceptabel — klant vult later aan in Odoo. list_price is niet verplicht.
-- **Service/garantiedatums:** Advies: Maintenance module gebruiken. `maintenance.equipment` heeft `warranty_date` en `effective_date`, koppelt via `lot_id` aan `stock.lot`. Geen custom module nodig.
+- **Service/garantiedatums:** Als lot_properties (date velden) op stock.lot. Definition op product.product. Niet via Maintenance (dat is voor intern).
+- **Prijzen:** Exclusief BTW (bron: offerte EMO-20260126-194)
+- **Garantie:** 1 jaar na aflevering (bron: offerte)
+- **Betaalconditie:** Betaling voor aflevering (bron: offerte)
+- **Voorwaarden:** Metaalunievoorwaarden (bron: offerte)
+- **Productomschrijvingen:** Uitgebreide specs geimporteerd in description_sale (bron: Odoo offerte.docx)
 
 ### BLOCKED — Wacht op klant-input
 De volgende vragen moeten beantwoord worden voordat we verder kunnen.
@@ -168,8 +173,7 @@ Zodra antwoorden binnen zijn: update dit bestand, pas clean.py aan, draai opnieu
 - [ ] **Rongen Systeem** zonder serienummer — importeren als accessoire of overslaan?
 - [ ] **Component-serienummers** (motors, DMC, scherm, acculader, etc.) — ook als lots importeren?
 - [ ] **Status** (Geleverd/Besteld/Gereserveerd) — hoe vastleggen in Odoo?
-- [ ] **Prijzen** — excl. of incl. BTW?
-- [ ] **Odoo modules** — Inventory en Maintenance activeren voor serienummers + service datums
+- [ ] **Aanbouwdeel → product mapping** — CR0.5 = Kraan 500KG of 1000KG? DU250 = Dumper opbouw?
 
 ## Odoo Omgeving Status
 
