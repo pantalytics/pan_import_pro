@@ -162,7 +162,25 @@ After AI verification passes, ask the client to spot-check:
 - Re-verify
 - Only then continue with the next batch
 
-### Step 8: Iterate
+### Step 8: Import Report (to client)
+
+After each import cycle, generate a structured report for the client covering:
+
+1. **Bronbestanden** — welke bestanden zijn verwerkt
+2. **Wat is geïmporteerd** — aantallen per model, met voorbeelden
+3. **Aannames** — wat heeft de AI zelf ingeschat (en kan de klant corrigeren)
+4. **Wat ging goed** — bevestiging dat data klopt (steekproef-resultaten)
+5. **Openstaande vragen** — wat is BLOCKED, wat heeft de klant nog niet beantwoord
+6. **Aanbevelingen** — volgende stappen, modules om te activeren, data die nog mist
+7. **Configuratie-wijzigingen** — wat is er in Odoo aangepast (modules, settings)
+
+Format: 3-tier (HELDER / AANNAMES / HULP NODIG), maar dan als samenvatting van de hele cyclus.
+
+Store the report:
+- In `migrations/<client>/logs/rapport_<timestamp>.md` (git-committed)
+- Optionally in Odoo as a note on the company record or as a Documents attachment
+
+### Step 9: Iterate
 
 Client checks results in Odoo. This always produces feedback.
 

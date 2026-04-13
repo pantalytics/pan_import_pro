@@ -30,7 +30,9 @@ migrations/*/input/*.docx
 # Cleaned and mapped data may contain sensitive client info
 migrations/*/cleaned/
 migrations/*/mapped/
-migrations/*/logs/
+migrations/*/logs/*.json
+# But DO commit rapport markdown files
+!migrations/*/logs/rapport_*.md
 
 # Claude Code
 .claude/
