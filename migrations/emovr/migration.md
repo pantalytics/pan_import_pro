@@ -132,14 +132,23 @@
 | machine_type | product_id | Lookup op product |
 | — | company_id | Emovr BV |
 
-## Open Vragen
-- [ ] Welke Odoo-modules zijn geactiveerd? (Inventory, Sales, Field Service?)
-- [ ] Moeten garantie/service/keuringsdatums als stock.lot velden of als apart model?
+## Feedback Ronde 1 (2026-04-13)
+
+### Beantwoord
+- **Ontbrekende prijzen:** Prijs €0 is acceptabel — klant vult later aan in Odoo. list_price is niet verplicht.
+- **Service/garantiedatums:** Advies: Maintenance module gebruiken. `maintenance.equipment` heeft `warranty_date` en `effective_date`, koppelt via `lot_id` aan `stock.lot`. Geen custom module nodig.
+
+### Aan klant vragen (multiple choice)
+- [ ] "Brouwer" en "Brouwer Egalisatie" — zelfde bedrijf of twee aparte? (klant weet het)
+- [ ] 5 machines zonder klant — voorraad, of moet klant toewijzen?
+- [ ] Rongen Systeem zonder serienummer — importeren als accessoire of overslaan?
+- [ ] 2x onvolledig serienummer EMTRC15092500 — wat zijn de volledige nummers?
+
+### Nog open (intern)
 - [ ] Moeten de component-serienummers (motors, DMC, etc.) ook als lots?
 - [ ] Is er een klant "Emovr BV" zelf nodig als partner (voor demo-machines)?
 - [ ] Status (Geleverd/Besteld/Gereserveerd) — als lot status of als apart veld?
 - [ ] Prijzen zonder BTW of inclusief?
-- [ ] "Brouwer" en "Brouwer Egalisatie" — zelfde klant of 2 aparte bedrijven?
 
 ## Odoo Omgeving Status
 
@@ -158,5 +167,5 @@ Geïmporteerd via import_records (Odoo load() met external IDs):
 
 ### Vereiste modules (nog te activeren door klant)
 - [ ] **Inventory (stock)** — nodig voor stock.lot (serienummers). Ga naar Instellingen → Apps → Installeer 'Voorraad'
+- [ ] **Maintenance** — nodig voor garantie/service/keuringsdatums. Ga naar Instellingen → Apps → Installeer 'Onderhoud'
 - [ ] Sales — waarschijnlijk al actief, te verifiëren
-- [ ] Overige modules afhankelijk van antwoorden op open vragen
