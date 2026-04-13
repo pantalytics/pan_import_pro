@@ -214,12 +214,15 @@ Helpdesk acts as the front door: a ticket can escalate to Repairs (ship it to us
 
 ---
 
+---
+
+## Services & Operations
+
 ### Quality
 
 **When to use:**
 - Quality checks on incoming/outgoing shipments or manufacturing
-- Min/max tolerance measurements
-- Quality alerts and corrective actions
+- Min/max tolerance measurements, quality alerts and corrective actions
 
 **When NOT to use:**
 - You only need visual inspection notes (use chatter/notes on picking)
@@ -234,8 +237,7 @@ Helpdesk acts as the front door: a ticket can escalate to Repairs (ship it to us
 
 **When to use:**
 - Schedule employee shifts and work schedules
-- Visual drag-and-drop resource planning
-- Forecast workload capacity
+- Visual drag-and-drop resource planning, forecast workload capacity
 
 **When NOT to use:**
 - You plan project tasks, not shifts (use Project)
@@ -252,7 +254,6 @@ Helpdesk acts as the front door: a ticket can escalate to Repairs (ship it to us
 **When to use:**
 - Rent out products with delivery and return tracking
 - Manage rental periods, pricing, and availability
-- Track which assets are currently out on rental
 
 **When NOT to use:**
 - You sell products outright (use Sales)
@@ -264,12 +265,295 @@ Helpdesk acts as the front door: a ticket can escalate to Repairs (ship it to us
 
 ---
 
+### Subscriptions
+
+**When to use:**
+- Recurring invoices on a schedule (monthly, yearly)
+- Subscription management with renewals, upselling, churn tracking
+
+**When NOT to use:**
+- One-time sales with no recurring component (use Sales)
+- Rental of physical goods with delivery/return (use Rental)
+
+**Key models:** `sale.order` (with recurrence), `sale.order.line`
+**Typical company:** SaaS, media, gym memberships, service contracts
+**Related apps:** Sales (extends it), Accounting (recurring invoices)
+
+---
+
+### PLM (Product Lifecycle Management)
+
+**When to use:**
+- Engineering change orders on products and bills of materials
+- Version control of BOMs, approval workflows for design changes
+
+**When NOT to use:**
+- You don't manufacture or have BOMs (use Sales/Inventory only)
+
+**Key models:** `mrp.eco` (engineering change order), `mrp.bom`
+**Typical company:** Manufacturers with engineering teams, product design companies
+**Related apps:** Manufacturing (BOMs), Quality
+
+---
+
+## Sales & Marketing
+
+### Appointments
+
+**When to use:**
+- Let clients book meetings in your agenda via a portal link
+- Schedule consultations, demos, or onboarding sessions
+
+**When NOT to use:**
+- Internal meeting scheduling only (use Calendar)
+
+**Key models:** `appointment.type`, `calendar.event`
+**Typical company:** Consultants, sales teams, service providers
+**Related apps:** Calendar, Website
+
+---
+
+### Email Marketing
+
+**When to use:**
+- Design and send mass emails to leads, customers, or mailing lists
+- Track open rates, clicks, and campaign performance
+
+**When NOT to use:**
+- Individual emails to specific customers (use Discuss/chatter)
+- SMS campaigns (use SMS Marketing)
+
+**Key models:** `mailing.mailing`, `mailing.list`, `mailing.contact`
+**Typical company:** Any company doing bulk outreach or newsletters
+**Related apps:** CRM (segments), Contacts, Marketing Automation
+
+---
+
+### SMS Marketing
+
+**When to use:**
+- Mass SMS campaigns to customers or leads
+- SMS notifications and reminders
+
+**When NOT to use:**
+- Individual SMS to one customer (use chatter SMS)
+- Email campaigns (use Email Marketing)
+
+**Key models:** `mailing.mailing` (with SMS type), `sms.sms`
+**Typical company:** Retail, hospitality, event companies
+**Related apps:** Email Marketing, CRM
+
+---
+
+### Marketing Automation
+
+**When to use:**
+- Multi-step automated campaigns (email, SMS, actions) triggered by conditions
+- Drip campaigns, lead nurturing sequences
+
+**When NOT to use:**
+- One-shot email blasts (use Email Marketing)
+- Simple follow-up reminders (use Activities)
+
+**Key models:** `marketing.campaign`, `marketing.activity`
+**Typical company:** B2B with complex nurture flows, e-commerce
+**Related apps:** Email Marketing, SMS Marketing, CRM
+
+---
+
+### Social Marketing
+
+**When to use:**
+- Manage social media posts (Facebook, Twitter, LinkedIn) from Odoo
+- Track engagement and visitor flows
+
+**When NOT to use:**
+- Internal communication (use Discuss)
+
+**Key models:** `social.post`, `social.account`
+**Typical company:** Marketing teams managing multiple social channels
+**Related apps:** Website, Email Marketing
+
+---
+
+### Events
+
+**When to use:**
+- Organize events, trainings, webinars with registration and ticketing
+- Sell event tickets online, manage attendees
+
+**When NOT to use:**
+- Internal meetings (use Calendar)
+- Online courses (use eLearning)
+
+**Key models:** `event.event`, `event.registration`, `event.ticket`
+**Typical company:** Conference organizers, training companies, associations
+**Related apps:** Website (online registration), Sales (ticket sales)
+
+---
+
+## Website & eCommerce
+
+### Website
+
+**When to use:**
+- Build a company website with CMS, blog, forms
+- Online portal for customers
+
+**When NOT to use:**
+- You only need an internal system (no public website needed)
+
+**Key models:** `website`, `website.page`
+**Typical company:** Any company wanting an online presence integrated with their ERP
+**Related apps:** eCommerce, Events, eLearning, Online Jobs
+
+---
+
+### eCommerce
+
+**When to use:**
+- Sell products online with shopping cart, checkout, payment
+- B2C or B2B webshop integrated with inventory and accounting
+
+**When NOT to use:**
+- You only sell via phone/email (use Sales)
+- Marketplace only (use Amazon/Lazada/Shopee connectors)
+
+**Key models:** `sale.order` (from website), `payment.transaction`
+**Typical company:** Retailers, manufacturers with direct sales
+**Related apps:** Website (required), Inventory (fulfillment), Sales
+
+---
+
+### eLearning
+
+**When to use:**
+- Publish online courses with video, quizzes, certifications
+- Employee training or customer education
+
+**When NOT to use:**
+- In-person training events (use Events)
+- Internal knowledge base (use Knowledge)
+
+**Key models:** `slide.channel`, `slide.slide`
+**Typical company:** Training companies, companies with employee onboarding
+**Related apps:** Website, Surveys (assessments)
+
+---
+
+## HR & People
+
+### Employees
+
+**When to use:**
+- Centralize employee information (contacts, contracts, skills)
+- Base module for all HR apps
+
+**When NOT to use:**
+- You only need to store customer contacts (use res.partner)
+
+**Key models:** `hr.employee`, `hr.department`, `hr.job`
+**Typical company:** Any company with employees
+**Related apps:** All HR apps depend on this
+
+---
+
+### Recruitment
+
+**When to use:**
+- Track job applications through a recruitment pipeline
+- Publish job offers, manage candidates
+
+**When NOT to use:**
+- You track sales leads, not job candidates (use CRM)
+
+**Key models:** `hr.applicant`, `hr.job`
+**Typical company:** Growing companies with active hiring
+**Related apps:** Employees, Website (Online Jobs)
+
+---
+
+### Time Off
+
+**When to use:**
+- Manage leave requests, allocations, and approval workflows
+- Track vacation days, sick leave, remote work
+
+**When NOT to use:**
+- You track project time, not absence time (use Timesheets)
+
+**Key models:** `hr.leave`, `hr.leave.allocation`, `hr.leave.type`
+**Typical company:** Any company with leave policies
+**Related apps:** Employees, Attendances, Planning
+
+---
+
+### Attendances
+
+**When to use:**
+- Track employee check-in/check-out times
+- Monitor working hours, overtime
+
+**When NOT to use:**
+- You track time spent on tasks (use Timesheets)
+- You manage shifts (use Planning)
+
+**Key models:** `hr.attendance`
+**Typical company:** Manufacturing, retail, any company requiring clock-in
+**Related apps:** Employees, Payroll
+
+---
+
+### Expenses
+
+**When to use:**
+- Employees submit expense reports for reimbursement
+- Validate, approve, and reinvoice expenses to customers
+
+**When NOT to use:**
+- Vendor bills for company purchases (use Purchase)
+
+**Key models:** `hr.expense`, `hr.expense.sheet`
+**Typical company:** Companies with traveling employees or reimbursable costs
+**Related apps:** Accounting (reimbursement), Project (reinvoice to client)
+
+---
+
+### Appraisals
+
+**When to use:**
+- Periodic employee performance reviews
+- Goal setting and feedback loops
+
+**When NOT to use:**
+- You track skills and certifications (use Skills Management)
+
+**Key models:** `hr.appraisal`, `hr.appraisal.goal`
+**Typical company:** Companies with formal review cycles
+**Related apps:** Employees, Skills Management
+
+---
+
+### Payroll
+
+**When to use:**
+- Calculate and process employee salaries
+- Localized salary rules, tax computation, payslips
+
+**When NOT to use:**
+- You outsource payroll entirely (but can still use for structure)
+
+**Key models:** `hr.payslip`, `hr.salary.rule`, `hr.contract`
+**Typical company:** Companies processing payroll in-house
+**Related apps:** Employees, Attendances, Time Off, Accounting
+
+---
+
 ### Fleet
 
 **When to use:**
 - Manage company vehicles, leasing contracts, insurance
 - Track fuel costs, maintenance, odometer readings
-- Assign vehicles to employees
 
 **When NOT to use:**
 - You rent vehicles to customers (use Rental)
@@ -278,6 +562,246 @@ Helpdesk acts as the front door: a ticket can escalate to Repairs (ship it to us
 **Key models:** `fleet.vehicle`, `fleet.vehicle.log.fuel`, `fleet.vehicle.log.services`
 **Typical company:** Companies with company cars or delivery fleets
 **Related apps:** HR (employee vehicle assignment), Accounting (cost tracking)
+
+---
+
+## Productivity & Communication
+
+### Discuss
+
+**When to use:**
+- Internal chat, channels, and the mail gateway (chatter on records)
+- Always installed — it's the communication backbone
+
+**Key models:** `mail.message`, `discuss.channel`, `mail.activity`
+**Note:** This is a core module, always active. Not really a "selection" choice.
+
+---
+
+### Calendar
+
+**When to use:**
+- Schedule internal meetings, sync with Google/Outlook calendars
+- Reminders and invitations
+
+**When NOT to use:**
+- Client-facing appointment booking (use Appointments)
+
+**Key models:** `calendar.event`, `calendar.attendee`
+**Related apps:** CRM (meeting scheduling), Discuss
+
+---
+
+### Documents
+
+**When to use:**
+- Centralized document management with tags, workspaces, sharing
+- Automated document workflows (e.g., scan → validate → archive)
+
+**When NOT to use:**
+- You just need file attachments on records (use built-in attachments)
+- Wiki-style knowledge base (use Knowledge)
+
+**Key models:** `documents.document`, `documents.tag`
+**Typical company:** Companies with compliance or heavy document needs
+**Related apps:** Accounting (auto-filing invoices), HR (employee documents)
+
+---
+
+### Knowledge
+
+**When to use:**
+- Internal wiki/knowledge base for procedures, policies, how-tos
+- Collaborative editing, structured articles
+
+**When NOT to use:**
+- Customer-facing documentation (use Website or eLearning)
+- File storage (use Documents)
+
+**Key models:** `knowledge.article`
+**Typical company:** Any company wanting structured internal documentation
+**Related apps:** Documents, eLearning
+
+---
+
+### Sign
+
+**When to use:**
+- Send documents for electronic signature (contracts, NDAs, forms)
+- Track signature status, multiple signers
+
+**When NOT to use:**
+- You need wet signatures or notarized documents
+
+**Key models:** `sign.template`, `sign.request`
+**Typical company:** Sales teams (contracts), HR (onboarding), Legal
+**Related apps:** Sales (quote signing), HR (contracts)
+
+---
+
+### Surveys
+
+**When to use:**
+- Create questionnaires, feedback forms, assessments
+- Live survey sessions, scoring, certifications
+
+**When NOT to use:**
+- You need a full course platform (use eLearning)
+- Simple internal forms (use custom models or Studio)
+
+**Key models:** `survey.survey`, `survey.question`, `survey.user_input`
+**Typical company:** HR (employee surveys), training, customer feedback
+**Related apps:** eLearning, Recruitment (interview scoring)
+
+---
+
+### Approvals
+
+**When to use:**
+- Formalized approval requests (budget, travel, purchases, etc.)
+- Multi-level approval workflows
+
+**When NOT to use:**
+- Purchase order approval (built into Purchase app)
+- Leave approval (built into Time Off app)
+
+**Key models:** `approval.request`, `approval.category`
+**Typical company:** Companies with formal approval processes
+**Related apps:** Purchase, Expenses
+
+---
+
+## Infrastructure & Technical
+
+### Studio
+
+**When to use:**
+- Customize Odoo UI, add fields, modify views without code
+- Build simple custom apps
+
+**When NOT to use:**
+- Complex business logic (use custom Python modules)
+
+**Note:** Enterprise only. Useful for adding custom fields that other apps lack.
+
+---
+
+### IoT (Internet of Things)
+
+**When to use:**
+- Connect physical devices (scales, printers, cameras) to Odoo
+- Manufacturing shop floor integration
+
+**When NOT to use:**
+- You have no physical devices to connect
+
+**Related apps:** Manufacturing, Point of Sale, Quality
+
+---
+
+### Point of Sale
+
+**When to use:**
+- Retail checkout, restaurant orders, bar tabs
+- Touch-screen interface for in-store sales
+
+**When NOT to use:**
+- Online sales only (use eCommerce)
+- B2B quotation-based sales (use Sales)
+
+**Key models:** `pos.order`, `pos.session`, `pos.config`
+**Typical company:** Retail shops, restaurants, food trucks
+**Related apps:** Inventory (stock), Accounting (payments), Restaurant (extension)
+
+---
+
+### Marketplace Connectors (Amazon, Lazada, Shopee)
+
+**When to use:**
+- Import orders from marketplaces into Odoo
+- Sync deliveries and inventory with marketplace
+
+**When NOT to use:**
+- You only sell on your own webshop (use eCommerce)
+
+**Related apps:** Sales, Inventory
+
+---
+
+### Frontdesk
+
+**When to use:**
+- Visitor check-in/check-out at reception
+- Notify employees when their guest arrives
+
+**Key models:** `frontdesk.visitor`
+**Typical company:** Offices with reception desks, factories with visitor management
+
+---
+
+### Phone (VoIP)
+
+**When to use:**
+- Make and receive calls from within Odoo
+- Click-to-call on contacts, call logging
+
+**When NOT to use:**
+- You don't use VoIP telephony
+
+**Related apps:** CRM (call logging), Helpdesk
+
+---
+
+### WhatsApp
+
+**When to use:**
+- Send WhatsApp messages from records (invoices, tickets, orders)
+- WhatsApp templates and automated messages
+
+**When NOT to use:**
+- Bulk marketing (limited by WhatsApp policies)
+
+**Related apps:** Sales, Helpdesk, Discuss
+
+---
+
+### Live Chat
+
+**When to use:**
+- Real-time chat widget on your website for visitor support
+- Chat routing to operators, canned responses
+
+**When NOT to use:**
+- Internal team chat (use Discuss)
+- Ticket-based support (use Helpdesk)
+
+**Key models:** `im_livechat.channel`
+**Typical company:** eCommerce, SaaS with website support
+**Related apps:** Website, Helpdesk
+
+---
+
+### Data Recycle
+
+**When to use:**
+- Automatically find and archive/delete old records
+- GDPR compliance, data hygiene
+
+**When NOT to use:**
+- Active data cleanup (manual or scripted)
+
+**Typical company:** Companies with data retention policies
+
+---
+
+### ESG
+
+**When to use:**
+- Track Environmental, Social, and Governance metrics
+- ESG reporting and compliance
+
+**Typical company:** Companies with sustainability reporting requirements
+**Related apps:** Accounting
 
 ---
 
