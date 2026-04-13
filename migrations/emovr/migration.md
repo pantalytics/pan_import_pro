@@ -1,6 +1,6 @@
 # Emovr Migratie
 
-## Status: Mock Cycle 1 — Clean done, partial test import done
+## Status: Mock Cycle 1 — Complete (klanten, contacten, producten geïmporteerd)
 
 ## Klant
 - **Bedrijf:** Emovr BV
@@ -146,17 +146,15 @@
 ### Huidige staat (2026-04-10)
 - **URL:** emovr.odoo.com
 - **Company:** Emovr B.V. (id=1)
-- **Bestaande data:** 6 partners (incl. 3 test-imports), 3 producten (test-imports)
+- **Bestaande data:** 13 klanten, 5 contactpersonen, 12 producten (alle via __import__ external IDs)
 
-### Test-imports (Mock Cycle 1)
-Aangemaakt op 2026-04-10 — kunnen verwijderd worden indien nodig:
-- res.partner 14: Compraan BV
-- res.partner 15: GKB Buiteninrichting
-- res.partner 16: SS Teknikk AS
-- res.partner 17: Marinus Slingerland (contact bij SS Teknikk AS)
-- product.template 1: TRC1.5 Carrier (38000000, EUR 19.950)
-- product.template 2: Optie Kraan 500KG (38040001, EUR 10.750)
-- product.template 3: Optie Dumper opbouw (38030001, EUR 3.250)
+### Import Mock Cycle 1 (2026-04-13)
+Geïmporteerd via import_records (Odoo load() met external IDs):
+- 13 klanten (res.partner, IDs 27-39) — __import__.partner_*
+- 5 contactpersonen (res.partner, IDs 40-44) — __import__.contact_*
+- 12 producten (product.template, IDs 4-15) — __import__.product_*
+- Idempotentie bewezen: herhaalde import updatet, geen duplicaten
+- Oude test-imports (zonder external IDs) opgeruimd
 
 ### Vereiste modules (nog te activeren door klant)
 - [ ] **Inventory (stock)** — nodig voor stock.lot (serienummers). Ga naar Instellingen → Apps → Installeer 'Voorraad'
