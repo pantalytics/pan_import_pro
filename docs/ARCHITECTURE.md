@@ -31,45 +31,105 @@ This file is:
 - **Auditable** — every decision is documented with rationale
 - **Transferable** — another consultant can pick it up
 
-## The Iterative Migration Loop
+## The Migration Process
 
-Migration is not a pipeline — it's a loop. Clients provide corrections, new data versions, and additional context across multiple cycles (typically 3-5 mock cycles before go-live).
+Migration is iterative, not linear. The client is involved at every step. Each step produces feedback for the client (HELDER / AANNAMES / HULP NODIG) and may require their input before proceeding.
+
+### Step 1: Know Your Client
+
+Before touching any data, understand the business.
+
+- **Scrape the client's website** for business context
+- **Store a client profile** in Odoo (res.partner Notes field) covering:
+  - What they do, what they sell, to whom
+  - Business structure (who produces, who sells, who services)
+  - Team size, key contacts
+  - Sales channels (direct, dealers, online)
+  - Business processes (purchase → sell → deliver → service)
+- **Determine migration type**: greenfield (new Odoo) vs brownfield (existing data)
+- **Document the goal**: what does the client want to achieve with Odoo?
+
+This profile is the foundation. Everything else depends on it. Store it in Odoo on the company record so it's always accessible.
+
+### Step 2: Determine Required Apps and Configuration
+
+Using the client profile, map business processes to Odoo apps.
+
+- **Consult the App Selection Guide** (`docs/odoo-app-guide.md`)
+- Use the Decision Framework: whose asset? where is the work done?
+- **Check which modules are installed** via MCP (`ir.module.module`)
+- **Install missing modules** if needed (MCP can do this via `res.config.settings` + `execute()`)
+- **Check configuration** (e.g., "Lots & Serial Numbers" must be enabled for serial tracking)
+- **Communicate to client**: "For your business, you need Sales, Purchase, Inventory, Field Service. Here's why."
+
+Common mistakes to avoid: see the "Fix Things Matrix" and Common Mistakes table in the App Guide.
+
+### Step 3: Scan & Understand the Data
+
+Read the client's source files (Excel, CSV, etc.) and understand what's in them.
+
+- **Analyze structure**: headers, data blocks, phantom rows, merged cells, free text
+- **Detect entities**: customers, products, serial numbers, dates, prices
+- **Identify quality issues**: duplicates, spelling variants, missing data, incomplete records
+- **Produce a 3-tier rapport**:
+  - **HELDER** — "This I could read with certainty"
+  - **AANNAMES** — "I wasn't 100% sure, I assumed this"
+  - **HULP NODIG** — "I need your input on this"
+- **Ask clarifying questions** — one at a time, multiple choice where possible
+
+### Step 4: Clean & Normalize
+
+Apply cleanup rules to produce normalized CSVs.
+
+- Name normalization, header unification, deduplication
+- Handle placeholders (N.V.T., ?, empty)
+- Split multi-block sheets into separate tables
+- **Git-commit the CSVs** so changes can be diffed between iterations
+- **Show diff to client** when re-running after feedback
+
+What is clear gets processed. What is BLOCKED (waiting for client input) stays marked as TODO.
+
+### Step 5: Map to Odoo
+
+Match cleaned data to Odoo models and fields.
+
+- **Query Odoo schemas** via MCP (`odoo://{model}/fields`)
+- Determine load order (dependencies: partners before contacts, products before serial numbers)
+- Generate external IDs for idempotent upsert (`__import__.partner_compraan_bv`)
+- **Show the import plan** to the client: "X records to create, Y to update, Z unchanged"
+- **Wait for approval** — NEVER import without explicit go-ahead
+
+### Step 6: Import (Upsert)
+
+Execute the approved plan via Odoo MCP `import_records` (wraps `load()`).
+
+- Import in dependency order
+- Use external IDs for idempotent upsert
+- Context: `tracking_disable=True` to suppress notifications
+- Log all created/updated record IDs
+- Report results to client
+
+### Step 7: Verify & Iterate
+
+Client checks results in Odoo. This always produces feedback.
+
+- New corrections? → Update migration.md, re-run clean, re-import (upsert)
+- New data version? → Drop new files in input/, repeat from Step 3
+- Missing data? → Add to BLOCKED list, ask client
+- Wrong app/model choice? → Revisit Step 2
+- Configuration wrong? → Fix settings, re-import
+
+Typically 3-5 cycles before go-live.
 
 ```
-        ┌──────────────────────────────────────────────┐
-        │                                              │
-        ▼                                              │
-   ┌──────────┐    ┌──────────┐    ┌──────────┐      │
-   │  SCAN    │ →  │  CLEAN   │ →  │  DIFF    │      │
-   │  Excel   │    │  → CSVs  │    │  vs      │      │
-   │  Rapport │    │  + git   │    │  previous│      │
-   │  3 tiers │    │  commit  │    │  version │      │
-   └──────────┘    └──────────┘    └──────────┘      │
-                                        │             │
-                                        ▼             │
-                                   ┌──────────┐      │
-                                   │  PLAN    │      │
-                                   │  X new   │      │
-                                   │  Y update│      │
-                                   │  Z skip  │      │
-                                   └────┬─────┘      │
-                                        │             │
-                                   approval?          │
-                                        │             │
-                                        ▼             │
-                                   ┌──────────┐      │
-                                   │  IMPORT  │      │
-                                   │  upsert  │      │
-                                   │  via MCP │      │
-                                   │  + log   │      │
-                                   └────┬─────┘      │
-                                        │             │
-                                        ▼             │
-                                   ┌──────────┐      │
-                                   │  VERIFY  │ ─────┘
-                                   │  client  │  correction needed?
-                                   │  checks  │  new version?
-                                   └──────────┘
+Step 1 ─→ Step 2 ─→ Step 3 ─→ Step 4 ─→ Step 5 ─→ Step 6 ─→ Step 7
+Know       Apps &    Scan &    Clean &   Map to    Import    Verify
+Client     Config    Understand Normalize Odoo      Upsert    & Iterate
+                                                              │
+                         ┌────────────────────────────────────┘
+                         │ Client feedback / corrections / new data
+                         ▼
+                    Back to Step 3, 4, 5, or 6 as needed
 ```
 
 ### Standard Migration Cycles (from ERP best practices)
