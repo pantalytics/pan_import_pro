@@ -171,9 +171,10 @@ Zodra antwoorden binnen zijn: update dit bestand, pas clean.py aan, draai opnieu
 - [ ] **2x onvolledig serienummer** EMTRC15092500 — wat zijn de volledige nummers?
       (1x bij SS Teknikk AS, 1x zonder klant)
 - [ ] **Rongen Systeem** zonder serienummer — importeren als accessoire of overslaan?
+- [ ] **Serienummer-scope** — Heeft alleen de carrier een serienummer, of krijgen aanbouwdelen (dumper, kraan, etc.) ook een eigen serienummer dat apart getrackt wordt?
+- [ ] **Aanbouwdeel → product mapping** — CR0.5 = Kraan 500KG of 1000KG? DU250 = Dumper opbouw?
 - [ ] **Component-serienummers** (motors, DMC, scherm, acculader, etc.) — ook als lots importeren?
 - [ ] **Status** (Geleverd/Besteld/Gereserveerd) — hoe vastleggen in Odoo?
-- [ ] **Aanbouwdeel → product mapping** — CR0.5 = Kraan 500KG of 1000KG? DU250 = Dumper opbouw?
 
 ## Odoo Omgeving Status
 
