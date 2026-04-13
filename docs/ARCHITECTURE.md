@@ -335,13 +335,15 @@ This wraps Odoo's native `load()` method, giving both scripts and Claude end-use
 - Search, create, update, delete records
 - Introspect model schemas (`odoo://{model}/fields`)
 - List available models
+- Import records with external IDs via `import_records` (wraps `load()`)
+- Install modules via `ir.module.module.button_immediate_install`
+- Change settings via `res.config.settings` create + `execute()`
 
 ### What MCP CANNOT do
-- Install or activate Odoo modules/apps
-- Call `load()` for upsert (needs enhancement)
-- Modify Odoo settings or configuration
+- Undo "done" stock moves (these are IRREVERSIBLE)
+- Download/create database backups (Odoo.sh dashboard only)
 
-**Implication:** The migration rapport must include a prerequisites section listing required modules with activation instructions for the client.
+**Implication:** The migration must include backup checkpoints before any stock operations.
 
 ## Data Flow Example
 
@@ -380,7 +382,13 @@ Mapped (Odoo-ready with external IDs):
 | Serienummers | `stock.lot` | name | product_id |
 | Prijslijst | `product.pricelist.item` | product + pricelist | fixed_price |
 
-Load order: `res.partner` → `product.template` → `product.pricelist.item` → `stock.lot`
+Load order:
+1. `res.partner` (companies + contacts + suppliers)
+2. `product.template` (with `is_storable=True`, `tracking='serial'`)
+3. `stock.lot` (serial numbers, linked to products)
+4. `purchase.order` + receipt (serial numbers enter stock from supplier)
+5. `sale.order` + delivery (serial numbers leave stock to customer)
+6. `product.pricelist.item` (optional)
 
 ## Error Handling
 
@@ -422,6 +430,102 @@ Requirements: Odoo.sh or self-hosted (NOT Odoo Online/SaaS — custom modules ca
 | Data Format | CSV (intermediate) | Clean, inspectable, git-versionable |
 | Version Control | Git | Track data changes between iterations |
 
+## Correct Import Order for Stock Operations
+
+Stock operations (purchases, sales, deliveries) require a specific order. Getting this wrong causes data corruption that can only be fixed with a database restore.
+
+### The Golden Rule: Purchase Before Sale
+
+For a distributor (buys from supplier, sells to customer):
+
+```
+1. Purchase Order (supplier)  →  2. Receipt (serial number enters stock)
+                                        ↓
+                                  serial number in WH/Stock
+                                        ↓
+3. Sale Order (customer)      →  4. Delivery (Odoo auto-reserves serial from stock)
+```
+
+**Why this order matters:** Odoo's delivery process auto-reserves serial numbers from available stock. If there's no stock (no receipt), Odoo creates phantom move lines that cross-contaminate lots between orders.
+
+**What goes wrong without purchase-first:**
+- Sale order + delivery without stock → Odoo creates move lines but can't properly reserve
+- Multiple deliveries validated → lots get assigned to wrong partners
+- "Done" stock moves are IRREVERSIBLE via API → only fix is database restore
+
+### Product Configuration for Serial Tracking
+
+Products that need serial number tracking must have:
+- `is_storable = True` — enables inventory tracking (Odoo 19: separate from product type)
+- `tracking = 'serial'` — enforces unique serial numbers
+- Without `is_storable`, serial numbers are not enforced and stock is not tracked
+
+### The Correct Full Sequence
+
+```
+LOW RISK (idempotent, safe to re-run):
+  1. Install all required modules
+  2. Configure settings (lots & serial numbers, etc.)
+  3. Import partners (res.partner)
+  4. Import products (product.template) with is_storable + tracking
+  5. Import serial numbers (stock.lot) without stock moves
+  6. Set lot_properties (dates, etc.)
+
+  → BACKUP CHECKPOINT ←
+
+HIGH RISK (irreversible, requires backup):
+  7. For EACH machine:
+     a. Create purchase order (supplier)
+     b. Confirm PO → receipt picking created
+     c. Assign serial number on receipt move line
+     d. Validate receipt → serial in WH/Stock
+     e. Create sale order (customer)
+     f. Confirm SO → delivery picking created
+     g. action_assign → Odoo auto-reserves serial from stock
+     h. Validate delivery → serial at customer
+     i. Fix historical dates on both pickings
+     j. VERIFY: check lot.partner_ids matches expected customer
+     k. VERIFY: check no other lots were affected
+
+  → If verification fails at any point: STOP, diagnose, restore backup
+```
+
+### Context Flags (prevent emails)
+
+Always use these context flags for data migration to prevent notifications:
+```python
+context = {
+    'tracking_disable': True,      # suppress ALL mail notifications
+    'mail_create_nolog': True,     # no "created" chatter message
+    'mail_notrack': True,          # no field change tracking
+    'skip_backorder': True,        # auto-skip backorder wizard
+}
+```
+
+## Lessons Learned (from Emovr migration)
+
+### Restore count: 3 database restores required
+
+| Restore | Cause | Lesson |
+|---------|-------|--------|
+| #1 | 12 sale orders created without purchase orders → lots got cross-contaminated with wrong partners | Always do purchase (receipt) before sale (delivery) |
+| #2 | Same problem persisted after attempted cleanup — "done" moves can't be deleted | Done stock moves are truly irreversible via API |
+| #3 | First test order (before bulk) had same issue — no stock available | Even 1 test order needs the full purchase→sale flow |
+
+### Critical mistakes to avoid
+
+1. **Don't skip the purchase order.** A distributor buys before they sell. Without a receipt, there's no stock for Odoo to reserve during delivery. This causes lot-shifting.
+
+2. **Don't batch stock operations before verifying.** Import ONE purchase+sale, verify the lot-partner assignment is correct, then batch the rest.
+
+3. **Don't assume Odoo will "just work" with stock moves.** Odoo's inventory module enforces strict audit trails. It auto-creates move lines, auto-reserves lots, and prevents deletion of done moves. You must understand these behaviors before importing.
+
+4. **Install ALL required modules upfront.** Check the client profile for required modules and install them all before any import. Don't discover mid-import that Purchase is missing.
+
+5. **`is_storable` is separate from product type in Odoo 19.** A product with `type='consu'` and `tracking='serial'` but `is_storable=False` will NOT enforce serial number uniqueness or track inventory.
+
+6. **Database backups are your only safety net for stock operations.** On Odoo.sh: create a manual backup before every high-risk batch. On Odoo Online: coordinate with support. There is no undo.
+
 ## Key Design Principles
 
 1. **Iterative, not linear** — The whole process is a loop. Imports must be re-runnable.
@@ -431,4 +535,8 @@ Requirements: Odoo.sh or self-hosted (NOT Odoo Online/SaaS — custom modules ca
 5. **External IDs as anchors** — Every imported record gets a stable `__import__` ID.
 6. **Git as version control** — Cleaned CSVs are committed so changes can be diffed.
 7. **Master data first** — Partners and products before transactional data.
-8. **Script everything** — Manual steps don't scale and introduce variance between cycles.
+8. **Purchase before sale** — Always create the inbound flow before the outbound flow.
+9. **Backup before stock operations** — Done inventory moves are irreversible.
+10. **Verify after every batch** — Sample records and cross-check against source data.
+11. **One question at a time** — Multiple choice where possible, never dump a wall of questions.
+12. **Know your client first** — Business profile determines app selection, data model, and import strategy.
