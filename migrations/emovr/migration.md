@@ -16,6 +16,19 @@
 - `Prijslijst Emovr 2026.xlsx` — Productprijzen 2026
 
 ## Domeinkennis
+
+### Bedrijfsstructuur (cruciaal)
+- **Emovr B.V.** = verkoop + marketing + after-sales service. Produceert NIET zelf.
+- **Stalero Assemblage** = productie/assemblage. Zelfde eigenaar (Robert van Laar, CEO).
+- Emovr koopt in bij Stalero → levert door aan klanten/dealers.
+- In Odoo: handels/distributiebedrijf, GEEN Manufacturing/MRP nodig.
+- Stalero is aangemaakt als leverancier (res.partner ID 49, __import__.partner_stalero)
+
+### Verkoopkanalen
+- **Direct:** Emovr verkoopt rechtstreeks aan NL klanten
+- **Dealers (belangrijk kanaal):** Tuboma (BE), SS-Teknikk AS (NO)
+
+### Product
 - Emovr maakt elektrische carriers (model TRC1.5) met verwisselbare aanbouwdelen
 - Aanbouwdelen: Dumper (DU250), Crane (CR0.5), Glasbok (GL1.0), Hefmast (HM0.5), Loader (HM1.2), Rongen systeem, Schaarlift (SCH1.4), Hydropack
 - Elke carrier heeft een uniek serienummer (formaat: EMTRC150925xxx)
