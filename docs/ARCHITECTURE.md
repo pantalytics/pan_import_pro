@@ -48,6 +48,12 @@ Before touching any data, understand the business.
   - Business processes (purchase → sell → deliver → service)
 - **Determine migration type**: greenfield (new Odoo) vs brownfield (existing data)
 - **Document the goal**: what does the client want to achieve with Odoo?
+- **Hosting & infrastructure**:
+  - **Odoo.sh**: staging branches available, self-service backups/restore, custom modules allowed. Best for migration.
+  - **Odoo Online (SaaS)**: NO self-service backups, NO custom modules, must contact support for restore. Higher risk.
+  - **Self-hosted**: full control, manual backup/restore responsibility.
+  - **Edition**: Community (free, limited apps) vs Enterprise (full app suite).
+- **Backup strategy**: How do we roll back if an import goes wrong? On Odoo.sh: use staging branch for testing, snapshot before production import. On Odoo Online: coordinate with support.
 
 This profile is the foundation. Everything else depends on it. Store it in Odoo on the company record so it's always accessible.
 
