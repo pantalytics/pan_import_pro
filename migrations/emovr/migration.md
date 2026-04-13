@@ -69,6 +69,7 @@
 | SS Teknik AS | SS Teknikk AS |
 | Sloetjes Montage | A Sloetjes montage |
 | marinus Slingerland | Marinus Slingerland |
+| Brouwer Egalisatie | Brouwer |
 
 ### Type normalisatie
 | Gevonden variant | Genormaliseerd |
@@ -138,11 +139,11 @@
 - **Ontbrekende prijzen:** Prijs €0 is acceptabel — klant vult later aan in Odoo. list_price is niet verplicht.
 - **Service/garantiedatums:** Advies: Maintenance module gebruiken. `maintenance.equipment` heeft `warranty_date` en `effective_date`, koppelt via `lot_id` aan `stock.lot`. Geen custom module nodig.
 
-### Aan klant vragen (multiple choice)
-- [ ] "Brouwer" en "Brouwer Egalisatie" — zelfde bedrijf of twee aparte? (klant weet het)
-- [ ] 5 machines zonder klant — voorraad, of moet klant toewijzen?
-- [ ] Rongen Systeem zonder serienummer — importeren als accessoire of overslaan?
-- [ ] 2x onvolledig serienummer EMTRC15092500 — wat zijn de volledige nummers?
+### Beantwoord door klant (ronde 2, 2026-04-13)
+- **Brouwer/Brouwer Egalisatie:** Zelfde klant → samenvoegen tot "Brouwer". Brouwer Egalisatie is een project.
+- **Machines zonder klant:** EMTRC150925009 → Van de Ende. Rest is in productie, nog geen klant.
+- **Rongen Systeem:** Accessoire, geen serienummer nodig. Importeren als product.
+- **Onvolledige serienummers:** EMTRC15092500 (SS Teknikk) → EMTRC1509250007. Andere → EMTRC1509250010.
 
 ### Nog open (intern)
 - [ ] Moeten de component-serienummers (motors, DMC, etc.) ook als lots?

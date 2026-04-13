@@ -38,7 +38,7 @@ KLANT_NORMALISATIE = {
     "van gelder": "Van Gelder",
     "van gelder ": "Van Gelder",
     "brouwer": "Brouwer",
-    "brouwer egalisatie": "Brouwer Egalisatie",
+    "brouwer egalisatie": "Brouwer",  # Klant bevestigd: zelfde bedrijf, project-naam
     "tuboma": "Tuboma",
     "emovr": "Emovr BV",
     "emovr bv": "Emovr BV",
@@ -65,6 +65,22 @@ TYPE_NORMALISATIE = {
     "du250": "DU250",
     "hm0,5": "HM0.5",
     "hm1,2": "HM1.2",
+}
+
+# Serienummer correcties (van klant-feedback)
+SERIENUMMER_CORRECTIES = {
+    "EMTRC15092500": None,  # Ambiguous — needs context to resolve
+}
+
+# Context-based serial number fixes: (original, klant) → corrected
+SERIENUMMER_KLANT_CORRECTIES = {
+    ("EMTRC15092500", "SS Teknikk AS"): "EMTRC1509250007",
+    ("EMTRC15092500", ""): "EMTRC1509250010",  # No klant = production unit
+}
+
+# Machine-to-klant corrections from client feedback
+MACHINE_KLANT_CORRECTIES = {
+    "EMTRC150925009": "Van de Ende",
 }
 
 # Sheets to skip entirely
@@ -254,14 +270,26 @@ def extract_machines(wb):
         if not serienummer or serienummer.strip() in ("EMTRC", "EMTRC "):
             continue
 
+        sn = serienummer.replace(" ", "")  # Remove spaces in serial numbers
+        klant = normalize_klant(row[6]) if len(row) > 6 else ""
+
+        # Apply serial number corrections from client feedback
+        sn_klant_key = (sn, klant)
+        if sn_klant_key in SERIENUMMER_KLANT_CORRECTIES:
+            sn = SERIENUMMER_KLANT_CORRECTIES[sn_klant_key]
+
+        # Apply klant corrections from client feedback
+        if sn in MACHINE_KLANT_CORRECTIES:
+            klant = MACHINE_KLANT_CORRECTIES[sn]
+
         machine = {
             "machine": normalize_value(row[0]),
             "type": normalize_type(row[1]) if len(row) > 1 else "",
-            "serienummer": serienummer.replace(" ", ""),  # Remove spaces in serial numbers
+            "serienummer": sn,
             "bouwjaar": normalize_value(row[3]) if len(row) > 3 else "",
             "motor_serienummer": normalize_value(row[4]) if len(row) > 4 else "",
             "productiedatum": format_date(row[5]) if len(row) > 5 else "",
-            "klant": normalize_klant(row[6]) if len(row) > 6 else "",
+            "klant": klant,
             "status": normalize_value(row[7]) if len(row) > 7 else "",
             "serienummer_motors": normalize_value(row[8]) if len(row) > 8 else "",
             "serienummer_dmc": normalize_value(row[9]) if len(row) > 9 else "",
