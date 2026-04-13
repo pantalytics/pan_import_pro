@@ -214,6 +214,73 @@ Helpdesk acts as the front door: a ticket can escalate to Repairs (ship it to us
 
 ---
 
+### Quality
+
+**When to use:**
+- Quality checks on incoming/outgoing shipments or manufacturing
+- Min/max tolerance measurements
+- Quality alerts and corrective actions
+
+**When NOT to use:**
+- You only need visual inspection notes (use chatter/notes on picking)
+
+**Key models:** `quality.check`, `quality.alert`, `quality.point`
+**Typical company:** Manufacturers, food/pharma companies with compliance requirements
+**Related apps:** Manufacturing (quality at work orders), Inventory (quality at receipts)
+
+---
+
+### Planning
+
+**When to use:**
+- Schedule employee shifts and work schedules
+- Visual drag-and-drop resource planning
+- Forecast workload capacity
+
+**When NOT to use:**
+- You plan project tasks, not shifts (use Project)
+- You dispatch field technicians (use Field Service)
+
+**Key models:** `planning.slot`, `planning.role`
+**Typical company:** Retail, hospitality, manufacturing with shift workers
+**Related apps:** HR (employees), Field Service, Manufacturing
+
+---
+
+### Rental
+
+**When to use:**
+- Rent out products with delivery and return tracking
+- Manage rental periods, pricing, and availability
+- Track which assets are currently out on rental
+
+**When NOT to use:**
+- You sell products outright (use Sales)
+- You lease vehicles long-term (use Fleet)
+
+**Key models:** `sale.order` (with rental fields), `sale.order.line`
+**Typical company:** Equipment rental, car rental, tool hire companies
+**Related apps:** Sales (extends it), Inventory (stock availability)
+
+---
+
+### Fleet
+
+**When to use:**
+- Manage company vehicles, leasing contracts, insurance
+- Track fuel costs, maintenance, odometer readings
+- Assign vehicles to employees
+
+**When NOT to use:**
+- You rent vehicles to customers (use Rental)
+- You maintain factory equipment (use Maintenance)
+
+**Key models:** `fleet.vehicle`, `fleet.vehicle.log.fuel`, `fleet.vehicle.log.services`
+**Typical company:** Companies with company cars or delivery fleets
+**Related apps:** HR (employee vehicle assignment), Accounting (cost tracking)
+
+---
+
 ## Common Mistakes
 
 | Mistake | Why it's wrong | Correct app |
@@ -226,18 +293,52 @@ Helpdesk acts as the front door: a ticket can escalate to Repairs (ship it to us
 
 ---
 
+## How to Use This Guide During Migration
+
+Before importing data into any Odoo model:
+
+1. Understand the client's business process (what do they do, for whom, where?)
+2. Use the Decision Framework and Fix Things Matrix to identify the right app
+3. Verify the required module is installed (`ir.module.module` via MCP)
+4. Check the model's fields via MCP (`odoo://{model}/fields`) before mapping
+5. If unsure — ask the client, don't guess
+
+## Generating This Guide from Odoo
+
+The app descriptions in this guide can be refreshed from any Odoo instance:
+
+```python
+# Via MCP: get all apps with descriptions
+search_records(
+    model="ir.module.module",
+    domain=[["summary", "!=", ""], ["application", "=", true]],
+    fields=["name", "shortdesc", "summary", "category_id", "state", "description"],
+    order="shortdesc asc"
+)
+```
+
+This gives you each app's official summary and description, plus whether it's installed.
+
 ## Sources
 
-- [Odoo 18.0 Documentation - Field Service](https://www.odoo.com/documentation/18.0/applications/services/field_service.html)
-- [Odoo 18.0 Documentation - Helpdesk](https://www.odoo.com/documentation/18.0/applications/services/helpdesk.html)
-- [Odoo 18.0 Documentation - After-Sales Services](https://www.odoo.com/documentation/18.0/applications/services/helpdesk/advanced/after_sales.html)
-- [Odoo 18.0 Documentation - Maintenance](https://www.odoo.com/documentation/18.0/applications/inventory_and_mrp/maintenance.html)
-- [Odoo 18.0 Documentation - Repairs](https://www.odoo.com/documentation/18.0/applications/inventory_and_mrp/repairs/repair_orders.html)
-- [Odoo 18.0 Documentation - Manufacturing](https://www.odoo.com/documentation/18.0/applications/inventory_and_mrp/manufacturing.html)
-- [Odoo 18.0 Documentation - Inventory](https://www.odoo.com/documentation/18.0/applications/inventory_and_mrp/inventory.html)
-- [Odoo 18.0 Documentation - Sales](https://www.odoo.com/documentation/18.0/applications/sales/sales.html)
-- [Odoo 18.0 Documentation - CRM](https://www.odoo.com/documentation/18.0/applications/sales/crm.html)
-- [Odoo 18.0 Documentation - Purchase](https://www.odoo.com/documentation/18.0/applications/inventory_and_mrp/purchase.html)
-- [Odoo 18.0 Documentation - Project](https://www.odoo.com/documentation/18.0/applications/services/project.html)
+### Odoo Official Documentation (18.0/19.0)
+- [Field Service](https://www.odoo.com/documentation/18.0/applications/services/field_service.html)
+- [Helpdesk](https://www.odoo.com/documentation/18.0/applications/services/helpdesk.html)
+- [After-Sales Services](https://www.odoo.com/documentation/18.0/applications/services/helpdesk/advanced/after_sales.html)
+- [Maintenance](https://www.odoo.com/documentation/18.0/applications/inventory_and_mrp/maintenance.html)
+- [Repairs](https://www.odoo.com/documentation/18.0/applications/inventory_and_mrp/repairs/repair_orders.html)
+- [Manufacturing](https://www.odoo.com/documentation/18.0/applications/inventory_and_mrp/manufacturing.html)
+- [Inventory](https://www.odoo.com/documentation/18.0/applications/inventory_and_mrp/inventory.html)
+- [Sales](https://www.odoo.com/documentation/18.0/applications/sales/sales.html)
+- [CRM](https://www.odoo.com/documentation/18.0/applications/sales/crm.html)
+- [Purchase](https://www.odoo.com/documentation/18.0/applications/inventory_and_mrp/purchase.html)
+- [Project](https://www.odoo.com/documentation/18.0/applications/services/project.html)
+
+### Odoo Community & Learning
 - [Odoo Forum: When to use Maintenance, Repairs, Field Services](https://www.odoo.com/forum/help-1/when-would-we-use-maintenance-repairs-and-field-services-apps-284702)
 - [Odoo Academy / eLearning](https://www.odoo.com/slides)
+- [Odoo App Store](https://www.odoo.com/app) — official app descriptions
+
+### Odoo Instance (live data)
+- `ir.module.module` — app descriptions, install status, categories
+- `odoo://{model}/fields` — field definitions per model via MCP
