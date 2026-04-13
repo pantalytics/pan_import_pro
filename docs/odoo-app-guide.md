@@ -858,6 +858,17 @@ This gives you each app's official summary and description, plus whether it's in
 - [Purchase](https://www.odoo.com/documentation/18.0/applications/inventory_and_mrp/purchase.html)
 - [Project](https://www.odoo.com/documentation/18.0/applications/services/project.html)
 
+### Odoo Documentation Source Code
+- [github.com/odoo/documentation](https://github.com/odoo/documentation) — full RST source of all Odoo docs. Use this for deep dives into specific features, configuration options, and workflows. Browse by version branch (e.g., `19.0`).
+- Key paths in the repo:
+  - `content/applications/inventory_and_mrp/` — Inventory, Manufacturing, Maintenance, Repairs, Quality, PLM
+  - `content/applications/services/` — Field Service, Helpdesk, Project
+  - `content/applications/sales/` — Sales, CRM, Subscriptions, Rental
+  - `content/applications/finance/` — Accounting, Invoicing
+  - `content/applications/hr/` — All HR apps
+  - `content/applications/websites/` — Website, eCommerce, eLearning
+  - `content/applications/productivity/` — Documents, Knowledge, Sign, Discuss
+
 ### Odoo Community & Learning
 - [Odoo Forum: When to use Maintenance, Repairs, Field Services](https://www.odoo.com/forum/help-1/when-would-we-use-maintenance-repairs-and-field-services-apps-284702)
 - [Odoo Academy / eLearning](https://www.odoo.com/slides)
