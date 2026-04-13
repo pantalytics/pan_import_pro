@@ -38,7 +38,7 @@ KLANT_NORMALISATIE = {
     "van gelder": "Van Gelder",
     "van gelder ": "Van Gelder",
     "brouwer": "Brouwer",
-    "brouwer egalisatie": "Brouwer",  # Klant bevestigd: zelfde bedrijf, project-naam
+    "brouwer egalisatie": "Brouwer Egalisatie",  # TODO: klant vragen of dit zelfde bedrijf is als Brouwer
     "tuboma": "Tuboma",
     "emovr": "Emovr BV",
     "emovr bv": "Emovr BV",
@@ -67,20 +67,16 @@ TYPE_NORMALISATIE = {
     "hm1,2": "HM1.2",
 }
 
-# Serienummer correcties (van klant-feedback)
-SERIENUMMER_CORRECTIES = {
-    "EMTRC15092500": None,  # Ambiguous — needs context to resolve
-}
-
-# Context-based serial number fixes: (original, klant) → corrected
+# Serienummer correcties (TODO: invullen na klant-feedback)
+# Format: (original_sn, klant) → corrected_sn
 SERIENUMMER_KLANT_CORRECTIES = {
-    ("EMTRC15092500", "SS Teknikk AS"): "EMTRC1509250007",
-    ("EMTRC15092500", ""): "EMTRC1509250010",  # No klant = production unit
+    # ("EMTRC15092500", "SS Teknikk AS"): "EMTRC1509250007",  # BLOCKED: aan klant vragen
+    # ("EMTRC15092500", ""): "EMTRC1509250010",               # BLOCKED: aan klant vragen
 }
 
-# Machine-to-klant corrections from client feedback
+# Machine-to-klant corrections (TODO: invullen na klant-feedback)
 MACHINE_KLANT_CORRECTIES = {
-    "EMTRC150925009": "Van de Ende",
+    # "EMTRC150925009": "???",  # BLOCKED: aan klant vragen welke klant
 }
 
 # Sheets to skip entirely

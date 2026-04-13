@@ -139,23 +139,20 @@
 - **Ontbrekende prijzen:** Prijs €0 is acceptabel — klant vult later aan in Odoo. list_price is niet verplicht.
 - **Service/garantiedatums:** Advies: Maintenance module gebruiken. `maintenance.equipment` heeft `warranty_date` en `effective_date`, koppelt via `lot_id` aan `stock.lot`. Geen custom module nodig.
 
-### GESIMULEERD voor test — terugdraaien, aan klant vragen!
-De volgende antwoorden zijn gesimuleerd om de iteratieve loop te testen.
-Ze zijn al verwerkt in clean.py en Odoo maar moeten nog bevestigd worden door de klant.
-- **Brouwer/Brouwer Egalisatie:** GESIMULEERD: samenvoegen tot "Brouwer"
-- **Machines zonder klant:** GESIMULEERD: EMTRC150925009 → Van de Ende
-- **Rongen Systeem:** GESIMULEERD: importeren als accessoire
-- **Onvolledige serienummers:** GESIMULEERD: EMTRC15092500 → EMTRC1509250007 / EMTRC1509250010
+### BLOCKED — Wacht op klant-input
+De volgende vragen moeten beantwoord worden voordat we verder kunnen.
+Zodra antwoorden binnen zijn: update dit bestand, pas clean.py aan, draai opnieuw.
 
-### Aan klant vragen
-- [ ] "Brouwer" en "Brouwer Egalisatie" — zelfde bedrijf of twee aparte?
-- [ ] 5 machines zonder klant — welke klant hoort erbij, of is het voorraad?
-- [ ] Rongen Systeem zonder serienummer — importeren als accessoire of overslaan?
-- [ ] 2x onvolledig serienummer EMTRC15092500 — wat zijn de volledige nummers?
-- [ ] Moeten de component-serienummers (motors, DMC, etc.) ook als lots?
-- [ ] Is er een klant "Emovr BV" zelf nodig als partner (voor demo-machines)?
-- [ ] Status (Geleverd/Besteld/Gereserveerd) — als lot status of als apart veld?
-- [ ] Prijzen zonder BTW of inclusief?
+- [ ] **Brouwer/Brouwer Egalisatie** — zelfde bedrijf of twee aparte?
+- [ ] **5 machines zonder klant** — welke klant hoort erbij, of is het voorraad?
+      EMTRC150925009, EMTRC1509250017, EMTRC1509250013, EMTRC1509250019, EMTRC15092500
+- [ ] **2x onvolledig serienummer** EMTRC15092500 — wat zijn de volledige nummers?
+      (1x bij SS Teknikk AS, 1x zonder klant)
+- [ ] **Rongen Systeem** zonder serienummer — importeren als accessoire of overslaan?
+- [ ] **Component-serienummers** (motors, DMC, scherm, acculader, etc.) — ook als lots importeren?
+- [ ] **Status** (Geleverd/Besteld/Gereserveerd) — hoe vastleggen in Odoo?
+- [ ] **Prijzen** — excl. of incl. BTW?
+- [ ] **Odoo modules** — Inventory en Maintenance activeren voor serienummers + service datums
 
 ## Odoo Omgeving Status
 
