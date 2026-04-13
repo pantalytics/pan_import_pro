@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <menuitem id="pan_import_pro_menu_root"
+              name="Import Pro"
+              web_icon="pan_import_pro,static/description/icon.png"
+              sequence="25"/>
+
+    <menuitem id="pan_import_pro_menu_projects"
+              name="Import Projects"
+              parent="pan_import_pro_menu_root"
+              action="pan_import_project_action"
+              sequence="10"/>
+
+</odoo>

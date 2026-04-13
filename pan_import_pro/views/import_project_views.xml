@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Form View -->
+    <record id="pan_import_project_view_form" model="ir.ui.view">
+        <field name="name">pan.import.project.form</field>
+        <field name="model">pan.import.project</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_start"
+                            string="Start"
+                            type="object"
+                            class="btn-primary"
+                            invisible="state != 'draft'"/>
+                    <button name="action_submit_for_review"
+                            string="Submit for Review"
+                            type="object"
+                            class="btn-primary"
+                            invisible="state != 'in_progress'"/>
+                    <button name="action_back_to_progress"
+                            string="Back to Work"
+                            type="object"
+                            invisible="state not in ('review',)"/>
+                    <button name="action_approve"
+                            string="Approve"
+                            type="object"
+                            class="btn-primary"
+                            invisible="state != 'review'"
+                            confirm="This approves the import plan. Next step writes data into Odoo. Continue?"/>
+                    <button name="action_import"
+                            string="Import"
+                            type="object"
+                            class="btn-primary"
+                            invisible="state != 'approved'"
+                            confirm="This will create and update records in Odoo. Continue?"/>
+                    <button name="action_back_to_progress"
+                            string="New Iteration"
+                            type="object"
+                            invisible="state != 'done'"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,in_progress,review,approved,done"
+                           options="{'clickable': '1'}"/>
+                </header>
+                <sheet>
+                    <div class="oe_title mb-3">
+                        <h1>
+                            <field name="name" placeholder="e.g. Klanten &amp; Machines"/>
+                        </h1>
+                    </div>
+
+                    <!-- Draft: explain what this is -->
+                    <div class="alert alert-light border" invisible="state != 'draft'">
+                        <p class="mb-0">
+                            Import Pro tracks your data migration into Odoo.
+                            Click <strong>Start</strong> to create a Documents folder and begin.
+                        </p>
+                    </div>
+
+                    <!-- Main content: always visible after draft -->
+                    <div invisible="state == 'draft'">
+                        <notebook>
+                            <!-- Tab 1: Company Profile -->
+                            <page string="Company Profile">
+                                <group>
+                                    <group>
+                                        <field name="company_partner_id" invisible="1"/>
+                                        <field name="company_id" invisible="1"/>
+                                        <field name="company_website" widget="url"/>
+                                    </group>
+                                </group>
+                                <field name="company_notes"
+                                       placeholder="Company profile: what you do, products/services, sales channels, key relationships..."/>
+                            </page>
+
+                            <!-- Tab 2: Documents -->
+                            <page string="Documents">
+                                <div class="mb-3">
+                                    <field name="folder_id" invisible="1"/>
+                                    <button name="action_open_documents" string="Upload Files"
+                                            type="object" class="btn-primary" icon="fa-upload"/>
+                                    <button name="action_sync_documents" string="Refresh"
+                                            type="object" class="btn-link" icon="fa-refresh"/>
+                                </div>
+                                <field name="import_document_ids">
+                                    <list open_form_view="True">
+                                        <field name="name"/>
+                                        <field name="analysis" string="Analysis" widget="html"/>
+                                        <field name="instructions"/>
+                                    </list>
+                                </field>
+                            </page>
+
+                            <!-- Tab 3: Questions -->
+                            <page string="Questions">
+                                <div class="alert alert-info" invisible="open_question_count == 0">
+                                    <strong><field name="open_question_count" class="fw-bold"/> open questions</strong>
+                                    — answer them to unblock the import.
+                                </div>
+                                <field name="question_ids">
+                                    <list editable="bottom"
+                                          decoration-muted="state == 'answered'">
+                                        <field name="sequence" widget="handle"/>
+                                        <field name="question"/>
+                                        <field name="answer"/>
+                                        <field name="source"/>
+                                        <field name="state" widget="badge"
+                                               decoration-warning="state == 'open'"
+                                               decoration-success="state == 'answered'"/>
+                                    </list>
+                                </field>
+                            </page>
+
+                            <!-- Tab 4: Import Plan -->
+                            <page string="Import Plan">
+                                <div class="alert alert-info text-center mb-3"
+                                     invisible="records_to_create == 0 and records_to_update == 0">
+                                    <span class="badge text-bg-success fs-6 me-2">
+                                        <field name="records_to_create"/> to create
+                                    </span>
+                                    <span class="badge text-bg-info fs-6 me-2">
+                                        <field name="records_to_update"/> to update
+                                    </span>
+                                    <span class="badge text-bg-secondary fs-6">
+                                        <field name="records_to_skip"/> unchanged
+                                    </span>
+                                </div>
+                                <field name="line_ids">
+                                    <list editable="bottom"
+                                          decoration-success="action == 'create'"
+                                          decoration-info="action == 'update'"
+                                          decoration-muted="action == 'skip'"
+                                          decoration-danger="state == 'error'">
+                                        <field name="sequence" widget="handle"/>
+                                        <field name="model_name"/>
+                                        <field name="record_name"/>
+                                        <field name="external_id"/>
+                                        <field name="action" widget="badge"
+                                               decoration-success="action == 'create'"
+                                               decoration-info="action == 'update'"
+                                               decoration-muted="action == 'skip'"/>
+                                        <field name="state" widget="badge"
+                                               decoration-success="state == 'done'"
+                                               decoration-danger="state == 'error'"
+                                               invisible="state == 'pending'"/>
+                                        <field name="error_message" optional="hide"/>
+                                    </list>
+                                </field>
+                            </page>
+                        </notebook>
+                    </div>
+
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- Import Document Form View -->
+    <record id="pan_import_document_view_form" model="ir.ui.view">
+        <field name="name">pan.import.document.form</field>
+        <field name="model">pan.import.document</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_title mb-3">
+                        <h1><field name="name" readonly="1"/></h1>
+                        <field name="mimetype" readonly="1"/>
+                    </div>
+                    <group string="Analysis">
+                        <field name="analysis" nolabel="1" colspan="2"/>
+                    </group>
+                    <group string="Instructions">
+                        <field name="instructions" nolabel="1" colspan="2"
+                               placeholder="e.g. Skip sheet 'rongen systeem'. Column C contains serial numbers."/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Kanban View -->
+    <record id="pan_import_project_view_kanban" model="ir.ui.view">
+        <field name="name">pan.import.project.kanban</field>
+        <field name="model">pan.import.project</field>
+        <field name="arch" type="xml">
+            <kanban>
+                <field name="open_question_count"/>
+                <templates>
+                    <t t-name="card">
+                        <field name="color" widget="color_picker"/>
+                        <div class="fw-bold fs-5 mb-1">
+                            <field name="name"/>
+                        </div>
+                        <field name="state" widget="badge"
+                               decoration-success="state == 'done'"
+                               decoration-info="state == 'review'"
+                               decoration-warning="state == 'approved'"/>
+                        <div class="mt-1 text-warning"
+                             t-if="record.open_question_count.raw_value">
+                            <field name="open_question_count"/> open questions
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- List View -->
+    <record id="pan_import_project_view_list" model="ir.ui.view">
+        <field name="name">pan.import.project.list</field>
+        <field name="model">pan.import.project</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="state" widget="badge"
+                       decoration-success="state == 'done'"
+                       decoration-info="state == 'review'"
+                       decoration-warning="state == 'approved'"/>
+                <field name="source_file_count" string="Files"/>
+                <field name="open_question_count" string="Questions"/>
+                <field name="records_to_create"/>
+                <field name="records_to_update"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="pan_import_project_action" model="ir.actions.act_window">
+        <field name="name">Import Projects</field>
+        <field name="res_model">pan.import.project</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Start your first import
+            </p>
+            <p>
+                Track your data migration into Odoo.
+                Claude analyzes your files, you review and approve here.
+            </p>
+        </field>
+    </record>
+
+</odoo>
