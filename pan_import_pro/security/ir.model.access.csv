@@ -1,5 +1,5 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_pan_import_project,pan.import.project,model_pan_import_project,base.group_user,1,1,1,1
-access_pan_import_document,pan.import.document,model_pan_import_document,base.group_user,1,1,1,1
 access_pan_import_question,pan.import.question,model_pan_import_question,base.group_user,1,1,1,1
-access_pan_import_line,pan.import.line,model_pan_import_line,base.group_user,1,1,1,1
+access_pan_import_plan,pan.import.plan,model_pan_import_plan,base.group_user,1,1,1,1
+access_pan_import_log,pan.import.log,model_pan_import_log,base.group_user,1,1,1,0

@@ -17,56 +17,21 @@ class ImportProject(models.Model):
         string="Project Name",
         required=True,
         tracking=True,
-        default=lambda self: _("New Import"),
     )
     state = fields.Selection(
         selection=[
             ('draft', 'Draft'),
             ('in_progress', 'In Progress'),
             ('review', 'Review'),
-            ('approved', 'Approved'),
-            ('importing', 'Importing'),
             ('done', 'Done'),
         ],
         default='draft',
         required=True,
         tracking=True,
     )
-
-    # --- Company profile (related to res.company → res.partner) ---
-    company_partner_id = fields.Many2one(
-        related='company_id.partner_id',
-        string="Company",
-    )
-    company_id = fields.Many2one(
-        'res.company',
-        default=lambda self: self.env.company,
-        required=True,
-    )
-    company_website = fields.Char(
-        related='company_partner_id.website',
-        readonly=False,
-        string="Website",
-    )
-    company_notes = fields.Html(
-        related='company_partner_id.comment',
-        readonly=False,
-        string="Company Profile",
-    )
-
-    # --- Documents ---
-    folder_id = fields.Many2one(
-        'documents.document',
-        string="Documents Folder",
-        domain=[('type', '=', 'folder')],
-    )
-    import_document_ids = fields.One2many(
-        'pan.import.document',
-        'project_id',
-        string="Documents",
-    )
-    source_file_count = fields.Integer(
-        compute='_compute_source_file_count',
+    notes = fields.Html(
+        string="Notes",
+        help="Free-form notes about this import project.",
     )
 
     # --- Questions (Claude asks, client answers) ---
@@ -79,22 +44,19 @@ class ImportProject(models.Model):
         compute='_compute_open_question_count',
     )
 
-    # --- Import plan ---
-    line_ids = fields.One2many(
-        'pan.import.line',
+    # --- Import plan (per model, not per record) ---
+    plan_ids = fields.One2many(
+        'pan.import.plan',
         'project_id',
-        string="Import Lines",
+        string="Import Plan",
     )
-    records_to_create = fields.Integer(compute='_compute_stats')
-    records_to_update = fields.Integer(compute='_compute_stats')
-    records_to_skip = fields.Integer(compute='_compute_stats')
 
-    color = fields.Integer()
-
-    @api.depends('import_document_ids')
-    def _compute_source_file_count(self):
-        for project in self:
-            project.source_file_count = len(project.import_document_ids)
+    # --- Import log (results) ---
+    log_ids = fields.One2many(
+        'pan.import.log',
+        'project_id',
+        string="Import Log",
+    )
 
     @api.depends('question_ids.state')
     def _compute_open_question_count(self):
@@ -103,108 +65,31 @@ class ImportProject(models.Model):
                 project.question_ids.filtered(lambda q: q.state == 'open')
             )
 
-    @api.depends('line_ids.action')
-    def _compute_stats(self):
-        for project in self:
-            lines = project.line_ids
-            project.records_to_create = len(lines.filtered(lambda l: l.action == 'create'))
-            project.records_to_update = len(lines.filtered(lambda l: l.action == 'update'))
-            project.records_to_skip = len(lines.filtered(lambda l: l.action == 'skip'))
-
     # --- Actions ---
 
     def action_start(self):
         self.ensure_one()
-        if not self.folder_id:
-            self.folder_id = self.env['documents.document'].create({
-                'name': self.name,
-                'type': 'folder',
-            })
         self.state = 'in_progress'
-
-    def action_open_documents(self):
-        """Open the Documents folder for this project."""
-        self.ensure_one()
-        return {
-            'type': 'ir.actions.act_url',
-            'url': f'/odoo/documents/{self.folder_id.access_token}',
-            'target': 'new',
-        }
-
-    def action_sync_documents(self):
-        """Sync documents from the folder into import_document_ids."""
-        self.ensure_one()
-        if not self.folder_id:
-            return
-        docs = self.env['documents.document'].search([
-            ('folder_id', '=', self.folder_id.id),
-            ('type', '!=', 'folder'),
-        ])
-        existing = self.import_document_ids.mapped('document_id')
-        for doc in docs - existing:
-            self.env['pan.import.document'].create({
-                'project_id': self.id,
-                'document_id': doc.id,
-            })
 
     def action_submit_for_review(self):
         self.ensure_one()
+        if not self.plan_ids:
+            raise UserError(_("Add an import plan before submitting for review."))
         self.state = 'review'
 
     def action_approve(self):
         self.ensure_one()
-        if not self.line_ids:
-            raise UserError(_("No import lines to approve."))
-        self.state = 'approved'
-
-    def action_import(self):
-        self.ensure_one()
-        self.state = 'importing'
-        for line in self.line_ids.filtered(lambda l: l.action in ('create', 'update')):
-            line.state = 'done'
+        if self.open_question_count:
+            raise UserError(_(
+                "Answer all open questions before approving. "
+                "%(count)s question(s) still open.",
+                count=self.open_question_count,
+            ))
         self.state = 'done'
-        self.message_post(body=_(
-            "Import completed: %(created)s created, %(updated)s updated.",
-            created=self.records_to_create,
-            updated=self.records_to_update,
-        ))
 
-    def action_back_to_progress(self):
+    def action_reopen(self):
         self.ensure_one()
         self.state = 'in_progress'
-
-
-class ImportDocument(models.Model):
-    _name = 'pan.import.document'
-    _description = 'Import Document'
-    _order = 'name'
-
-    project_id = fields.Many2one(
-        'pan.import.project',
-        required=True,
-        ondelete='cascade',
-    )
-    document_id = fields.Many2one(
-        'documents.document',
-        required=True,
-        ondelete='cascade',
-    )
-    name = fields.Char(
-        related='document_id.name',
-        string="File",
-    )
-    mimetype = fields.Char(
-        related='document_id.attachment_id.mimetype',
-        string="Type",
-    )
-    analysis = fields.Html(
-        string="Analysis",
-        help="What was found: record counts, data preview, quality issues.",
-    )
-    instructions = fields.Text(
-        string="Instructions",
-        help="How should this document be processed? Override AI decisions here.",
-    )
 
 
 class ImportQuestion(models.Model):
@@ -218,16 +103,35 @@ class ImportQuestion(models.Model):
         ondelete='cascade',
     )
     sequence = fields.Integer(default=10)
+    question_type = fields.Selection(
+        selection=[
+            ('open', 'Open'),
+            ('single', 'Single Choice'),
+            ('multi', 'Multiple Choice'),
+        ],
+        default='open',
+        required=True,
+        string="Type",
+    )
     question = fields.Text(
         string="Question",
         required=True,
     )
+    options = fields.Text(
+        string="Options",
+        help="One option per line. Used for single/multiple choice questions.",
+    )
     answer = fields.Text(
         string="Answer",
     )
+    source_document_id = fields.Many2one(
+        'documents.document',
+        string="Source Document",
+        ondelete='set null',
+    )
     source = fields.Char(
-        string="Source",
-        help="Where this question came from (file, sheet, field).",
+        string="Source Detail",
+        help="Additional context: sheet name, column, row range.",
     )
     state = fields.Selection(
         selection=[
@@ -239,15 +143,21 @@ class ImportQuestion(models.Model):
         store=True,
     )
 
+    def _get_options_list(self):
+        """Return options as a list of strings."""
+        if not self.options:
+            return []
+        return [o.strip() for o in self.options.strip().split('\n') if o.strip()]
+
     @api.depends('answer')
     def _compute_state(self):
         for question in self:
             question.state = 'answered' if question.answer else 'open'
 
 
-class ImportLine(models.Model):
-    _name = 'pan.import.line'
-    _description = 'Import Line'
+class ImportPlan(models.Model):
+    _name = 'pan.import.plan'
+    _description = 'Import Plan'
     _order = 'sequence, id'
 
     project_id = fields.Many2one(
@@ -256,23 +166,60 @@ class ImportLine(models.Model):
         ondelete='cascade',
     )
     sequence = fields.Integer(default=10)
-    model_name = fields.Char(string="Odoo Model")
-    external_id = fields.Char(string="External ID")
-    record_name = fields.Char(string="Record")
+    model_name = fields.Char(
+        string="Odoo Model",
+        required=True,
+        help="e.g. res.partner, product.template",
+    )
+    description = fields.Text(
+        string="Description",
+        help="What will be imported and from which source.",
+    )
+    record_count = fields.Integer(
+        string="Records",
+        help="How many records will be created or updated.",
+    )
     action = fields.Selection(
         selection=[
             ('create', 'Create'),
             ('update', 'Update'),
-            ('skip', 'Skip'),
+            ('create_update', 'Create & Update'),
         ],
+        default='create',
     )
     state = fields.Selection(
         selection=[
-            ('pending', 'Pending'),
+            ('planned', 'Planned'),
             ('done', 'Done'),
             ('error', 'Error'),
         ],
-        default='pending',
+        default='planned',
     )
-    error_message = fields.Text()
-    data_preview = fields.Text(string="Data")
+    notes = fields.Text(
+        string="Notes",
+        help="Mapping details, field decisions, or issues.",
+    )
+
+
+class ImportLog(models.Model):
+    _name = 'pan.import.log'
+    _description = 'Import Log'
+    _order = 'create_date desc'
+
+    project_id = fields.Many2one(
+        'pan.import.project',
+        required=True,
+        ondelete='cascade',
+    )
+    model_name = fields.Char(string="Odoo Model")
+    records_created = fields.Integer(string="Created")
+    records_updated = fields.Integer(string="Updated")
+    records_failed = fields.Integer(string="Failed")
+    summary = fields.Text(
+        string="Summary",
+        help="What happened during this import batch.",
+    )
+    error_details = fields.Text(
+        string="Errors",
+        help="Details of any errors encountered.",
+    )

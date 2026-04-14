@@ -67,10 +67,10 @@ For each dataset, ask: "Do we actually need this in Odoo?" Unused products, dorm
 
 Build a complete company profile BEFORE touching any data. This determines everything else: which Odoo modules to activate, how to map data, what questions to ask.
 
-1. Read the current profile from Odoo (`res.partner.comment` of the company)
+1. Read the current profile from Odoo (`res.partner` of the company, check `comment` field)
 2. If there's a website, research it
 3. Ask clarifying questions — one at a time
-4. Write the profile via MCP
+4. Write the profile to `res.partner.comment` via MCP
 
 The profile must cover:
 - **Core Business**: what the company does, main products/services
@@ -85,50 +85,49 @@ Based on the company profile, determine which Odoo modules are needed (see [REFE
 
 **Check ALL required modules upfront.** Don't install reactively as you go — compare the full list against what's installed via MCP. The client must activate modules themselves (MCP cannot install modules). Tell them exactly which ones and why.
 
-### Step 3: Upload Documents
+### Step 3: Upload & Analyze Documents
 
-The user uploads files to the Import Pro Documents folder in Odoo. After upload, sync the document list on the project.
+The user provides files (Excel, CSV, etc.). Analyze each file:
+- What data is in this file (record counts, column names)
+- Sample data (first rows)
+- Quality issues: duplicates, missing values, inconsistent formatting
+- Source references: which sheet, which columns, which rows
 
-### Step 4: Analyze Each Document
+Summarize findings in the project notes or the chat.
 
-For each uploaded document:
-1. Read the file content
-2. Write an analysis to `pan.import.document.analysis` (HTML) covering:
-   - What data is in this file (record counts, column names)
-   - Sample data (first rows as a table)
-   - Quality issues: duplicates, missing values, inconsistent formatting
-   - Source references: which sheet, which columns, which rows
-3. Suggest processing instructions in `pan.import.document.instructions`
+### Step 4: Ask Questions
 
-### Step 5: Ask Questions
+For anything unclear, create a `pan.import.question` record via MCP:
+- `question_type`: `open`, `single` (radio buttons), or `multi` (checkboxes)
+- `question`: the question text
+- `options`: one option per line (for single/multi choice questions)
+- `source_document_id`: link to the source document in Odoo Documents (if applicable)
+- `source`: additional context (sheet name, column, row range)
+- Leave `answer` empty — the client fills it in via the portal
 
-For anything unclear, create a `pan.import.question` record:
-- `question`: the question text, with A/B/C options when possible
-- `source`: where it came from (file name, sheet, row)
-- Leave `answer` empty — the client fills it in via Odoo UI
+**Always add one final open question** (sequence 99): "Heb je nog andere opmerkingen, instructies of wensen voor deze import?" — this gives the client space to add anything you didn't think to ask.
 
 **Check back for answers before proceeding.** Open questions block the import. When the client answers, read the answers via MCP and continue.
 
-### Step 6: Import Plan
+### Step 5: Import Plan
 
-Based on profile + analyses + answers, write the import plan to `pan.import.line`:
+Based on profile + analyses + answers, write the import plan to `pan.import.plan` via MCP:
 - `model_name`: e.g. res.partner, product.template
-- `record_name`: human-readable name
-- `external_id`: `__import__.{model_slug}_{natural_key_slug}`
-- `action`: create / update / skip
+- `description`: what will be imported and from which source
+- `record_count`: how many records
+- `action`: create / update / create_update
 
-Present the plan clearly: "X records to create, Y to update, Z unchanged."
+Present the plan clearly: "3.000 contacts to create, 200 products to update."
 
-### Step 7: Get Approval
+### Step 6: Get Approval
 
-Move the project to "Review" state. The client reviews in Odoo:
-- Document analyses
+Move the project to "Review" state via MCP. The client reviews in Odoo:
 - Answered questions
 - Import plan
 
 **NEVER import without explicit approval.** Show the plan, wait for "go ahead."
 
-### Step 8: Import
+### Step 7: Import
 
 Use Odoo's `import_records` (load method) via MCP with external IDs.
 
@@ -146,12 +145,17 @@ Load order (dependencies first):
 4. Then import the rest in small batches
 5. After each batch: spot-check 3-5 records against source data
 
+After each batch, log the result to `pan.import.log` via MCP:
+- `model_name`, `records_created`, `records_updated`, `records_failed`
+- `summary`: what happened
+- `error_details`: if anything went wrong
+
 **Stock operations are HIGH RISK.** Done pickings/moves are IRREVERSIBLE via API. The only fix is a database restore. Never assume Odoo will handle stock moves as expected — always verify.
 
-### Step 9: Verify & Iterate
+### Step 8: Verify & Iterate
 
 After import:
-- Summarize what was done (X created, Y updated)
+- Summarize what was done (X created, Y updated) — visible in the Log tab
 - Ask the client to check the results in Odoo
 - If corrections needed → back to Step 3 with new data
 - Running the import again = same result (idempotent via external IDs)
@@ -172,10 +176,10 @@ __import__.lot_emtrc150925001
 
 | Model | Purpose |
 |-------|---------|
-| `pan.import.project` | The migration project (state, folder, profile link) |
-| `pan.import.document` | Per-document analysis and instructions |
+| `pan.import.project` | The migration project (state tracking, notes) |
 | `pan.import.question` | Questions (Claude asks, client answers in Odoo) |
-| `pan.import.line` | Import plan (create/update/skip per record) |
+| `pan.import.plan` | Import plan per model (what will be imported, how many records) |
+| `pan.import.log` | Import results (created, updated, failed counts per batch) |
 
 ## What You Never Do
 

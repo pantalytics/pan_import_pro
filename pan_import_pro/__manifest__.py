@@ -18,10 +18,12 @@ Works with Claude (Code/Co-work) via MCP.
         'contacts',
         'documents',
         'mail',
+        'portal',
     ],
     'data': [
         'security/ir.model.access.csv',
         'views/import_project_views.xml',
+        'views/portal_templates.xml',
         'views/menu.xml',
     ],
 
