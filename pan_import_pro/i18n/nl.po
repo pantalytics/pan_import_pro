@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-04-13 00:00+0000\n"
-"PO-Revision-Date: 2026-04-13 00:00+0000\n"
+"POT-Creation-Date: 2026-04-14 00:00+0000\n"
+"PO-Revision-Date: 2026-04-14 00:00+0000\n"
 "Last-Translator: \n"
 "Language-Team: Dutch\n"
 "Language: nl\n"
@@ -27,247 +27,31 @@ msgid "Import Pro"
 msgstr "Import Pro"
 
 #. module: pan_import_pro
-#: model:ir.ui.menu,name:pan_import_pro.pan_import_pro_menu_projects
-msgid "Import Projects"
-msgstr "Importprojecten"
-
-#. module: pan_import_pro
 #: model:ir.model,name:pan_import_pro.model_pan_import_project
 msgid "Import Project"
 msgstr "Importproject"
 
 #. module: pan_import_pro
-#: model:ir.model,name:pan_import_pro.model_pan_import_line
-msgid "Import Line"
-msgstr "Importregel"
+#: model:ir.model,name:pan_import_pro.model_pan_import_plan
+msgid "Import Plan"
+msgstr "Importplan"
 
 #. module: pan_import_pro
-#: model:ir.model.fields,field_description:pan_import_pro.field_pan_import_project__name
-msgid "Project Name"
-msgstr "Projectnaam"
+#: model:ir.model,name:pan_import_pro.model_pan_import_log
+msgid "Import Log"
+msgstr "Importlog"
 
 #. module: pan_import_pro
-#: model:ir.model.fields,field_description:pan_import_pro.field_pan_import_project__company_sector
-msgid "Sector"
-msgstr "Sector"
+#: model:ir.model.fields.selection,name:pan_import_pro.selection__pan_import_project__state__draft
+msgid "Draft"
+msgstr "Concept"
 
 #. module: pan_import_pro
-#: model:ir.model.fields,field_description:pan_import_pro.field_pan_import_project__company_description
-msgid "About this company"
-msgstr "Over dit bedrijf"
-
-#. module: pan_import_pro
-#: model:ir.model.fields,field_description:pan_import_pro.field_pan_import_project__company_structure
-msgid "Business structure"
-msgstr "Bedrijfsstructuur"
-
-#. module: pan_import_pro
-#: model:ir.model.fields,field_description:pan_import_pro.field_pan_import_project__source_file_ids
-msgid "Source Files"
-msgstr "Bronbestanden"
-
-#. module: pan_import_pro
-#: model:ir.model.fields.selection,name:pan_import_pro.selection__pan_import_project__state__intro
-msgid "Introduction"
-msgstr "Introductie"
-
-#. module: pan_import_pro
-#: model:ir.model.fields.selection,name:pan_import_pro.selection__pan_import_project__state__profile
-msgid "Profile"
-msgstr "Profiel"
-
-#. module: pan_import_pro
-#: model:ir.model.fields.selection,name:pan_import_pro.selection__pan_import_project__state__upload
-msgid "Upload"
-msgstr "Uploaden"
-
-#. module: pan_import_pro
-#: model:ir.model.fields.selection,name:pan_import_pro.selection__pan_import_project__state__analyzing
-msgid "Analyzing"
-msgstr "Analyseren"
-
-#. module: pan_import_pro
-#: model:ir.model.fields.selection,name:pan_import_pro.selection__pan_import_project__state__review
-msgid "Review"
-msgstr "Beoordelen"
-
-#. module: pan_import_pro
-#: model:ir.model.fields.selection,name:pan_import_pro.selection__pan_import_project__state__approved
-msgid "Approved"
-msgstr "Goedgekeurd"
-
-#. module: pan_import_pro
-#: model:ir.model.fields.selection,name:pan_import_pro.selection__pan_import_project__state__importing
-msgid "Importing"
-msgstr "Importeren"
+#: model:ir.model.fields.selection,name:pan_import_pro.selection__pan_import_project__state__in_progress
+msgid "In Progress"
+msgstr "Bezig"
 
 #. module: pan_import_pro
 #: model:ir.model.fields.selection,name:pan_import_pro.selection__pan_import_project__state__done
 msgid "Done"
 msgstr "Gereed"
-
-#. module: pan_import_pro
-#: model:ir.model.fields,field_description:pan_import_pro.field_pan_import_line__model_name
-msgid "Odoo Model"
-msgstr "Odoo-model"
-
-#. module: pan_import_pro
-#: model:ir.model.fields,field_description:pan_import_pro.field_pan_import_line__external_id
-msgid "External ID"
-msgstr "Extern ID"
-
-#. module: pan_import_pro
-#: model:ir.model.fields,field_description:pan_import_pro.field_pan_import_line__record_name
-msgid "Record"
-msgstr "Record"
-
-#. module: pan_import_pro
-#: model:ir.model.fields.selection,name:pan_import_pro.selection__pan_import_line__action__create
-msgid "Create"
-msgstr "Aanmaken"
-
-#. module: pan_import_pro
-#: model:ir.model.fields.selection,name:pan_import_pro.selection__pan_import_line__action__update
-msgid "Update"
-msgstr "Bijwerken"
-
-#. module: pan_import_pro
-#: model:ir.model.fields.selection,name:pan_import_pro.selection__pan_import_line__action__skip
-msgid "Skip"
-msgstr "Overslaan"
-
-#. module: pan_import_pro
-#: model:ir.model.fields.selection,name:pan_import_pro.selection__pan_import_line__state__pending
-msgid "Pending"
-msgstr "Wachtend"
-
-#. module: pan_import_pro
-#: model:ir.model.fields.selection,name:pan_import_pro.selection__pan_import_line__state__error
-msgid "Error"
-msgstr "Fout"
-
-#. module: pan_import_pro
-#: code:addons/pan_import_pro/models/import_project.py:0
-#, python-format
-msgid "Upload at least one file before analyzing."
-msgstr "Upload minstens één bestand voordat u analyseert."
-
-#. module: pan_import_pro
-#: code:addons/pan_import_pro/models/import_project.py:0
-#, python-format
-msgid "No import lines to approve."
-msgstr "Geen importregels om goed te keuren."
-
-#. module: pan_import_pro
-#: code:addons/pan_import_pro/models/import_project.py:0
-#, python-format
-msgid "Import completed: %(created)s created, %(updated)s updated."
-msgstr "Import voltooid: %(created)s aangemaakt, %(updated)s bijgewerkt."
-
-#. Button labels
-msgid "Get Started"
-msgstr "Aan de slag"
-
-msgid "Next"
-msgstr "Volgende"
-
-msgid "Analyze"
-msgstr "Analyseren"
-
-msgid "Approve"
-msgstr "Goedkeuren"
-
-msgid "Upload New Version"
-msgstr "Nieuwe versie uploaden"
-
-msgid "Import"
-msgstr "Importeren"
-
-msgid "New Iteration"
-msgstr "Nieuwe iteratie"
-
-#. Intro page
-msgid "Welcome to Import Pro"
-msgstr "Welkom bij Import Pro"
-
-msgid "Import Pro helps you bring your data into Odoo in 5 steps. AI analyzes your files, maps them to the right Odoo fields, and you stay in control at every step."
-msgstr "Import Pro helpt u uw data in 5 stappen in Odoo te laden. AI analyseert uw bestanden, koppelt ze aan de juiste Odoo-velden, en u houdt bij elke stap de controle."
-
-msgid "1. Profile"
-msgstr "1. Profiel"
-
-msgid "Tell us about your business so AI understands the context."
-msgstr "Vertel ons over uw bedrijf zodat AI de context begrijpt."
-
-msgid "2. Upload"
-msgstr "2. Uploaden"
-
-msgid "Upload all your data files at once. Excel, CSV, PDF — anything goes."
-msgstr "Upload al uw bestanden in één keer. Excel, CSV, PDF — alles kan."
-
-msgid "3. Review"
-msgstr "3. Beoordelen"
-
-msgid "AI analyzes and maps your data. You review and answer any questions."
-msgstr "AI analyseert en koppelt uw data. U beoordeelt en beantwoordt eventuele vragen."
-
-msgid "4. Approve"
-msgstr "4. Goedkeuren"
-
-msgid "See exactly what will be created or updated. Nothing happens without your approval."
-msgstr "Zie precies wat er aangemaakt of bijgewerkt wordt. Er gebeurt niets zonder uw goedkeuring."
-
-msgid "5. Import"
-msgstr "5. Importeren"
-
-msgid "Data is imported into Odoo. Found something to correct? Start a new iteration."
-msgstr "Data wordt in Odoo geladen. Iets te corrigeren? Start een nieuwe iteratie."
-
-#. Step headers
-msgid "Step 1 — Your company"
-msgstr "Stap 1 — Uw bedrijf"
-
-msgid "Help AI understand your business so it can map your data to the right places in Odoo."
-msgstr "Help AI uw bedrijf te begrijpen zodat het uw data op de juiste plek in Odoo kan plaatsen."
-
-msgid "Step 2 — Upload your data"
-msgstr "Stap 2 — Upload uw data"
-
-msgid "Upload all files at once so AI can see the full picture and find connections between your data."
-msgstr "Upload alle bestanden in één keer zodat AI het volledige beeld heeft en verbanden kan vinden."
-
-msgid "Step 3 — Review"
-msgstr "Stap 3 — Beoordelen"
-
-msgid "AI has scanned your files. Review what was found, answer any open questions, then approve or upload a corrected version."
-msgstr "AI heeft uw bestanden gescand. Bekijk de bevindingen, beantwoord openstaande vragen, en keur goed of upload een gecorrigeerde versie."
-
-msgid "Step 4 — Ready to import"
-msgstr "Stap 4 — Klaar om te importeren"
-
-msgid "Import complete"
-msgstr "Import voltooid"
-
-#. Rapport headers
-msgid "Helder"
-msgstr "Helder"
-
-msgid "Aannames"
-msgstr "Aannames"
-
-msgid "Hulp Nodig"
-msgstr "Hulp Nodig"
-
-#. Empty state
-msgid "Start your first import"
-msgstr "Start uw eerste import"
-
-msgid "Upload your data files and let AI analyze, map, and import them into Odoo."
-msgstr "Upload uw databestanden en laat AI ze analyseren, koppelen en importeren in Odoo."
-
-#. Confirm dialogs
-msgid "This approves the import plan. Next step writes data into Odoo. Continue?"
-msgstr "Hiermee keurt u het importplan goed. De volgende stap schrijft data naar Odoo. Doorgaan?"
-
-msgid "This will create and update records in Odoo. Continue?"
-msgstr "Hiermee worden records aangemaakt en bijgewerkt in Odoo. Doorgaan?"
