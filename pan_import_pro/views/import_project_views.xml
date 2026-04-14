@@ -20,7 +20,7 @@
                 <sheet>
                     <div class="oe_title mb-3">
                         <h1>
-                            <field name="name" placeholder="e.g. Emovr B.V. — Klanten &amp; Producten"/>
+                            <field name="name" placeholder="e.g. Klanten &amp; Producten"/>
                         </h1>
                     </div>
 
