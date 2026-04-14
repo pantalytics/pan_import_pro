@@ -83,6 +83,7 @@ class ImportProject(models.Model):
             'description': '<p>We hebben een aantal vragen over je data. '
                            'Beantwoord ze zodat we verder kunnen met de import.</p>',
             'description_done': '<p>Bedankt! We verwerken je antwoorden en komen bij je terug.</p>',
+            'survey_type': 'survey',
             'access_mode': 'public',
             'questions_layout': 'one_page',
         })
