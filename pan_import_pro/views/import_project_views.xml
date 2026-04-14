@@ -13,113 +13,140 @@
                             type="object"
                             class="btn-primary"
                             invisible="state != 'draft'"/>
-                    <button name="action_submit_for_review"
-                            string="Submit for Review"
-                            type="object"
-                            class="btn-primary"
-                            invisible="state != 'in_progress'"/>
-                    <button name="action_reopen"
-                            string="Reopen"
-                            type="object"
-                            invisible="state not in ('review', 'done')"/>
-                    <button name="action_approve"
-                            string="Approve"
-                            type="object"
-                            class="btn-primary"
-                            invisible="state != 'review'"
-                            confirm="This marks the import as done. Continue?"/>
                     <field name="state" widget="statusbar"
-                           statusbar_visible="draft,in_progress,review,done"/>
+                           statusbar_visible="draft,in_progress,done"
+                           options="{'clickable': '1'}"/>
                 </header>
                 <sheet>
                     <div class="oe_title mb-3">
                         <h1>
-                            <field name="name" placeholder="e.g. Klanten &amp; Producten"/>
+                            <field name="name" placeholder="e.g. Emovr B.V. — Klanten &amp; Producten"/>
                         </h1>
                     </div>
 
                     <!-- Draft: explain what this is -->
                     <div class="alert alert-light border" invisible="state != 'draft'">
                         <p class="mb-0">
-                            <strong>Import Pro</strong> tracks your data migration into Odoo.
-                            Claude analyzes your files, asks questions here, and proposes an import plan for you to review.
-                            Click <strong>Start</strong> to begin.
+                            Click <strong>Start</strong> to create a Documents folder and questionnaire.
                         </p>
                     </div>
 
-                    <notebook invisible="state == 'draft'">
+                    <!-- Main content -->
+                    <div invisible="state == 'draft'">
 
-                        <!-- Tab 1: Questions -->
-                        <page string="Questions"
-                              badge="open_question_count">
-                            <div class="alert alert-warning" invisible="open_question_count == 0">
-                                <strong><field name="open_question_count" class="fw-bold"/> open question(s)</strong>
-                                — answer them so Claude can continue.
-                            </div>
-                            <field name="question_ids">
-                                <list editable="bottom"
-                                      decoration-muted="state == 'answered'">
-                                    <field name="sequence" widget="handle"/>
-                                    <field name="question_type"/>
-                                    <field name="question"/>
-                                    <field name="options" optional="hide"/>
-                                    <field name="answer"
-                                           placeholder="Type your answer here..."/>
-                                    <field name="source_document_id"/>
-                                    <field name="source"/>
-                                    <field name="state" widget="badge"
-                                           decoration-warning="state == 'open'"
-                                           decoration-success="state == 'answered'"/>
-                                </list>
-                            </field>
-                        </page>
+                        <!-- Documents button -->
+                        <field name="folder_id" invisible="1"/>
+                        <div class="mb-4">
+                            <button name="action_open_folder" string="Open Documents"
+                                    type="object" class="btn btn-primary" icon="fa-folder-open"/>
+                        </div>
 
-                        <!-- Tab 2: Import Plan -->
-                        <page string="Import Plan">
-                            <field name="plan_ids">
-                                <list editable="bottom"
-                                      decoration-success="state == 'done'"
-                                      decoration-danger="state == 'error'">
-                                    <field name="sequence" widget="handle"/>
-                                    <field name="model_name"/>
-                                    <field name="description"/>
-                                    <field name="record_count"/>
-                                    <field name="action" widget="badge"
-                                           decoration-success="action == 'create'"
-                                           decoration-info="action == 'update'"/>
-                                    <field name="state" widget="badge"
-                                           decoration-success="state == 'done'"
-                                           decoration-danger="state == 'error'"
-                                           invisible="state == 'planned'"/>
-                                    <field name="notes" optional="hide"/>
-                                </list>
-                            </field>
-                        </page>
+                        <notebook>
+                            <!-- Tab 1: Surveys -->
+                            <page string="Surveys">
+                                <field name="survey_ids">
+                                    <list open_form_view="True">
+                                        <field name="title"/>
+                                        <field name="answer_done_count" string="Responses"/>
+                                    </list>
+                                </field>
+                            </page>
 
-                        <!-- Tab 3: Import Log -->
-                        <page string="Log">
-                            <field name="log_ids" readonly="1">
-                                <list decoration-danger="records_failed > 0">
-                                    <field name="create_date" string="Date"/>
-                                    <field name="model_name"/>
-                                    <field name="records_created"/>
-                                    <field name="records_updated"/>
-                                    <field name="records_failed"/>
-                                    <field name="summary"/>
-                                    <field name="error_details" optional="hide"/>
-                                </list>
-                            </field>
-                        </page>
+                            <!-- Tab 2: Import Plan -->
+                            <page string="Import Plan">
+                                <field name="plan_ids">
+                                    <list editable="bottom"
+                                          decoration-success="state == 'done'"
+                                          decoration-danger="state == 'error'"
+                                          open_form_view="True">
+                                        <field name="sequence" widget="handle"/>
+                                        <field name="model_name"/>
+                                        <field name="description"/>
+                                        <field name="record_count"/>
+                                        <field name="action" widget="badge"
+                                               decoration-success="action == 'create'"
+                                               decoration-info="action == 'update'"/>
+                                        <field name="state" widget="badge"
+                                               decoration-success="state == 'done'"
+                                               decoration-danger="state == 'error'"
+                                               invisible="state == 'planned'"/>
+                                    </list>
+                                </field>
+                            </page>
 
-                        <!-- Tab 4: Notes -->
-                        <page string="Notes">
-                            <field name="notes"
-                                   placeholder="Free-form notes about this migration..."/>
-                        </page>
+                            <!-- Tab 2: Import Log -->
+                            <page string="Log">
+                                <field name="log_ids">
+                                    <list decoration-danger="records_failed > 0"
+                                          open_form_view="True">
+                                        <field name="create_date" string="Date"/>
+                                        <field name="model_name"/>
+                                        <field name="records_created"/>
+                                        <field name="records_updated"/>
+                                        <field name="records_failed"/>
+                                        <field name="name" string="Summary"/>
+                                    </list>
+                                </field>
+                            </page>
 
-                    </notebook>
+                        </notebook>
+                    </div>
                 </sheet>
                 <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- Import Log Form View -->
+    <record id="pan_import_log_view_form" model="ir.ui.view">
+        <field name="name">pan.import.log.form</field>
+        <field name="model">pan.import.log</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_title mb-3">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="project_id" readonly="1"/>
+                            <field name="model_name"/>
+                            <field name="create_date" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="records_created"/>
+                            <field name="records_updated"/>
+                            <field name="records_failed"/>
+                        </group>
+                    </group>
+                    <field name="notes"
+                           placeholder="Details of what was imported, mapping decisions, issues..."/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Import Plan Form View -->
+    <record id="pan_import_plan_view_form" model="ir.ui.view">
+        <field name="name">pan.import.plan.form</field>
+        <field name="model">pan.import.plan</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="model_name"/>
+                            <field name="description"/>
+                            <field name="record_count"/>
+                        </group>
+                        <group>
+                            <field name="action"/>
+                            <field name="state"/>
+                        </group>
+                    </group>
+                    <field name="notes"
+                           placeholder="Mapping details, field decisions, source references..."/>
+                </sheet>
             </form>
         </field>
     </record>
@@ -133,8 +160,8 @@
                 <field name="name"/>
                 <field name="state" widget="badge"
                        decoration-success="state == 'done'"
-                       decoration-info="state == 'review'"/>
-                <field name="open_question_count" string="Open Questions"/>
+                       decoration-info="state == 'review'"
+                       decoration-warning="state == 'approved'"/>
             </list>
         </field>
     </record>

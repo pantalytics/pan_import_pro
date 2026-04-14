@@ -22,137 +22,98 @@ class ImportProject(models.Model):
         selection=[
             ('draft', 'Draft'),
             ('in_progress', 'In Progress'),
-            ('review', 'Review'),
             ('done', 'Done'),
         ],
         default='draft',
         required=True,
         tracking=True,
     )
-    notes = fields.Html(
-        string="Notes",
-        help="Free-form notes about this import project.",
+
+    # --- Documents ---
+    folder_id = fields.Many2one(
+        'documents.document',
+        string="Documents Folder",
+        domain=[('type', '=', 'folder')],
     )
 
-    # --- Questions (Claude asks, client answers) ---
-    question_ids = fields.One2many(
-        'pan.import.question',
-        'project_id',
-        string="Questions",
-    )
-    open_question_count = fields.Integer(
-        compute='_compute_open_question_count',
+    # --- Surveys (questions for client, multiple rounds) ---
+    survey_ids = fields.Many2many(
+        'survey.survey',
+        string="Questionnaires",
     )
 
-    # --- Import plan (per model, not per record) ---
+    # --- Import plan ---
     plan_ids = fields.One2many(
         'pan.import.plan',
         'project_id',
         string="Import Plan",
     )
 
-    # --- Import log (results) ---
+    # --- Import log ---
     log_ids = fields.One2many(
         'pan.import.log',
         'project_id',
         string="Import Log",
     )
 
-    @api.depends('question_ids.state')
-    def _compute_open_question_count(self):
-        for project in self:
-            project.open_question_count = len(
-                project.question_ids.filtered(lambda q: q.state == 'open')
-            )
 
     # --- Actions ---
 
     def action_start(self):
+        """Start the project: create folder."""
         self.ensure_one()
+        if not self.folder_id:
+            self.folder_id = self.env['documents.document'].create({
+                'name': self.name,
+                'type': 'folder',
+            })
+            self.env['documents.document'].create({
+                'name': 'Origineel',
+                'type': 'folder',
+                'folder_id': self.folder_id.id,
+            })
         self.state = 'in_progress'
 
-    def action_submit_for_review(self):
+    def action_new_survey(self):
+        """Create a new survey round and add it to the project."""
         self.ensure_one()
-        if not self.plan_ids:
-            raise UserError(_("Add an import plan before submitting for review."))
-        self.state = 'review'
+        round_nr = len(self.survey_ids) + 1
+        survey = self.env['survey.survey'].create({
+            'title': f'{self.name} — Ronde {round_nr}',
+            'description': '<p>We hebben een aantal vragen over je data. '
+                           'Beantwoord ze zodat we verder kunnen met de import.</p>',
+            'description_done': '<p>Bedankt! We verwerken je antwoorden en komen bij je terug.</p>',
+            'access_mode': 'public',
+            'questions_layout': 'one_page',
+        })
+        self.survey_ids = [fields.Command.link(survey.id)]
+        # Open the survey form so the consultant can add questions
+        return {
+            'type': 'ir.actions.act_window',
+            'res_model': 'survey.survey',
+            'res_id': survey.id,
+            'view_mode': 'form',
+            'target': 'current',
+        }
 
-    def action_approve(self):
+    def action_open_folder(self):
+        """Open the Documents folder."""
         self.ensure_one()
-        if self.open_question_count:
-            raise UserError(_(
-                "Answer all open questions before approving. "
-                "%(count)s question(s) still open.",
-                count=self.open_question_count,
-            ))
+        if not self.folder_id:
+            return
+        return {
+            'type': 'ir.actions.act_url',
+            'url': self.folder_id.access_url,
+            'target': 'new',
+        }
+
+    def action_mark_done(self):
+        self.ensure_one()
         self.state = 'done'
 
     def action_reopen(self):
         self.ensure_one()
         self.state = 'in_progress'
-
-
-class ImportQuestion(models.Model):
-    _name = 'pan.import.question'
-    _description = 'Import Question'
-    _order = 'state desc, sequence, id'
-
-    project_id = fields.Many2one(
-        'pan.import.project',
-        required=True,
-        ondelete='cascade',
-    )
-    sequence = fields.Integer(default=10)
-    question_type = fields.Selection(
-        selection=[
-            ('open', 'Open'),
-            ('single', 'Single Choice'),
-            ('multi', 'Multiple Choice'),
-        ],
-        default='open',
-        required=True,
-        string="Type",
-    )
-    question = fields.Text(
-        string="Question",
-        required=True,
-    )
-    options = fields.Text(
-        string="Options",
-        help="One option per line. Used for single/multiple choice questions.",
-    )
-    answer = fields.Text(
-        string="Answer",
-    )
-    source_document_id = fields.Many2one(
-        'documents.document',
-        string="Source Document",
-        ondelete='set null',
-    )
-    source = fields.Char(
-        string="Source Detail",
-        help="Additional context: sheet name, column, row range.",
-    )
-    state = fields.Selection(
-        selection=[
-            ('open', 'Open'),
-            ('answered', 'Answered'),
-        ],
-        default='open',
-        compute='_compute_state',
-        store=True,
-    )
-
-    def _get_options_list(self):
-        """Return options as a list of strings."""
-        if not self.options:
-            return []
-        return [o.strip() for o in self.options.strip().split('\n') if o.strip()]
-
-    @api.depends('answer')
-    def _compute_state(self):
-        for question in self:
-            question.state = 'answered' if question.answer else 'open'
 
 
 class ImportPlan(models.Model):
@@ -195,7 +156,7 @@ class ImportPlan(models.Model):
         ],
         default='planned',
     )
-    notes = fields.Text(
+    notes = fields.Html(
         string="Notes",
         help="Mapping details, field decisions, or issues.",
     )
@@ -204,8 +165,14 @@ class ImportPlan(models.Model):
 class ImportLog(models.Model):
     _name = 'pan.import.log'
     _description = 'Import Log'
+    _inherit = ['mail.thread']
     _order = 'create_date desc'
 
+    name = fields.Char(
+        string="Title",
+        compute='_compute_name',
+        store=True,
+    )
     project_id = fields.Many2one(
         'pan.import.project',
         required=True,
@@ -215,11 +182,24 @@ class ImportLog(models.Model):
     records_created = fields.Integer(string="Created")
     records_updated = fields.Integer(string="Updated")
     records_failed = fields.Integer(string="Failed")
-    summary = fields.Text(
-        string="Summary",
-        help="What happened during this import batch.",
+    notes = fields.Html(
+        string="Notes",
+        help="Details of what was imported, issues encountered, etc.",
     )
-    error_details = fields.Text(
-        string="Errors",
-        help="Details of any errors encountered.",
-    )
+
+    @api.depends('model_name', 'records_created', 'records_updated')
+    def _compute_name(self):
+        for log in self:
+            parts = []
+            if log.model_name:
+                parts.append(log.model_name)
+            counts = []
+            if log.records_created:
+                counts.append(f'{log.records_created} created')
+            if log.records_updated:
+                counts.append(f'{log.records_updated} updated')
+            if log.records_failed:
+                counts.append(f'{log.records_failed} failed')
+            if counts:
+                parts.append(', '.join(counts))
+            log.name = ' — '.join(parts) if parts else _("New Log Entry")

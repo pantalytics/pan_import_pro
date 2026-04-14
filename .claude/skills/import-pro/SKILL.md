@@ -97,17 +97,18 @@ Summarize findings in the project notes or the chat.
 
 ### Step 4: Ask Questions
 
-For anything unclear, create a `pan.import.question` record via MCP:
-- `question_type`: `open`, `single` (radio buttons), or `multi` (checkboxes)
-- `question`: the question text
-- `options`: one option per line (for single/multi choice questions)
-- `source_document_id`: link to the source document in Odoo Documents (if applicable)
-- `source`: additional context (sheet name, column, row range)
-- Leave `answer` empty — the client fills it in via the portal
+Use the `survey.survey` linked to the project. Add questions via MCP on `survey.question`:
 
-**Always add one final open question** (sequence 99): "Heb je nog andere opmerkingen, instructies of wensen voor deze import?" — this gives the client space to add anything you didn't think to ask.
+- `survey_id`: the project's survey ID
+- `title`: the question text
+- `description`: HTML with context — include download links to source files: `<a href="/web/content/{attachment_id}?download=true">filename.xlsx</a> — sheet X, kolom Y, rij Z`
+- `question_type`: `simple_choice`, `multiple_choice`, `text_box`, `char_box`, `numerical_box`
+- `suggested_answer_ids`: for choice questions, create options via `[[0,0,{"value":"Option A"}],...]`
+- `constr_mandatory`: False (let client skip questions they can't answer yet)
 
-**Check back for answers before proceeding.** Open questions block the import. When the client answers, read the answers via MCP and continue.
+**Always add one final text_box question** (sequence 99): "Heb je nog andere opmerkingen, instructies of wensen voor deze import?"
+
+The survey URL is shareable — the consultant sends the link to the client. **Check back for answers** by reading `survey.user_input.line` records via MCP.
 
 ### Step 5: Import Plan
 
@@ -122,10 +123,10 @@ Present the plan clearly: "3.000 contacts to create, 200 products to update."
 ### Step 6: Get Approval
 
 Move the project to "Review" state via MCP. The client reviews in Odoo:
-- Answered questions
+- Survey answers
 - Import plan
 
-**NEVER import without explicit approval.** Show the plan, wait for "go ahead."
+The client approves by setting `client_approved` on the project, or the consultant does it after verbal confirmation. **NEVER import without explicit approval.**
 
 ### Step 7: Import
 
@@ -176,8 +177,9 @@ __import__.lot_emtrc150925001
 
 | Model | Purpose |
 |-------|---------|
-| `pan.import.project` | The migration project (state tracking, notes) |
-| `pan.import.question` | Questions (Claude asks, client answers in Odoo) |
+| `pan.import.project` | Migration project (state, folder, survey, approval) |
+| `survey.survey` | Questionnaire for the client (linked via project.survey_id) |
+| `survey.question` | Individual questions with source references |
 | `pan.import.plan` | Import plan per model (what will be imported, how many records) |
 | `pan.import.log` | Import results (created, updated, failed counts per batch) |
 
