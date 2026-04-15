@@ -155,10 +155,47 @@ After each batch, log the result to `pan.import.log` via MCP:
 
 ### Step 8: Verify & Iterate
 
-After import:
-- Summarize what was done (X created, Y updated) — visible in the Log tab
-- Ask the client to check the results in Odoo
-- If corrections needed → back to Step 3 with new data
+After each import batch, run a 4-layer validation. Log results to `pan.import.log` with HTML notes.
+
+**Layer 1 — Count & Match (technical integrity)**
+Compare record counts between source and Odoo:
+- How many records in the source file vs. how many created in Odoo?
+- Are there duplicates? Check for records with the same name/key.
+- Are all external IDs (`__import__.*`) present and unique?
+
+Do this via MCP: `search_records` with count, compare against source data.
+
+**Layer 2 — Field Spot Checks (data quality)**
+Pick 3-5 random records per model and verify field values against the source:
+- Are names normalized correctly? (no leftover typos or variants)
+- Are numeric values correct? (prices, quantities)
+- Are selection fields set correctly? (company_type, tracking, etc.)
+- Are text fields complete? (descriptions, notes)
+
+Present findings as a table: record name | field | expected | actual | status.
+
+**Layer 3 — Relational Integrity (references)**
+Verify that relationships between records are correct:
+- Do contacts point to the right parent company?
+- Do pricelist items reference the right product?
+- Do stock lots link to the right product with correct tracking?
+- Are there orphaned records? (contacts without parent, lots without product)
+
+Do this via MCP: read records with relational fields, verify lookups.
+
+**Layer 4 — Functional Walkthrough (business process)**
+Test that a real business process works with the imported data:
+- Create a draft sale order → select an imported customer → add an imported product
+- Does the price come through correctly?
+- Does serial number tracking work?
+- Can you assign a lot/serial?
+
+Describe the test to the client so they can execute it. You cannot do UI-level tests via MCP.
+
+**After validation:**
+- Log all findings to `pan.import.log` with detailed HTML notes
+- Present a summary: what passed, what needs attention
+- If corrections needed → back to Step 3 with new/corrected data
 - Running the import again = same result (idempotent via external IDs)
 
 ## External ID Convention
